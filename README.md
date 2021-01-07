@@ -11,12 +11,12 @@ This node is a companion for any binary sensor (physical or virtual), storing al
 
 <a name="installation_in_node-red"></a>
 ### In Node-RED (preferred)
-* Via Manage Palette -> Search for "node-red-contrib-automationController"
+* Via Manage Palette -> Search for "node-red-contrib-automation-controller"
 
 <a name="installation_in_a_shell"></a>
 ### In a shell
 * go to the Node-RED installation folder, e.g.: `~/.node-red`
-* run `npm install node-red-contrib-automationController`
+* run `npm install node-red-contrib-automation-controller`
 
 <a name="usage"></a>
 ## Usage
