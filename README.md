@@ -1,4 +1,4 @@
-# node-red-multi-sensor
+# node-red-contrib-automationController
 Binary motion sensor and activation state machine node for Node-red.
 
 This node is a companion for any binary sensor (physical or virtual), storing all recieved sensors and their state and merge them into a single node.
@@ -21,7 +21,6 @@ This node is a companion for any binary sensor (physical or virtual), storing al
 <a name="usage"></a>
 ## Usage
 
-![node-explain](assets/ac_explain_large.png "Node explaination")
 **Fig. 2:** Node explaination
 
 The automation controller node is a multi-functional event/State handling node that takes an input and tries to match it against a number of different created rules.
