@@ -1,5 +1,5 @@
 {
-  "name": "node-red-contrib-automationController",
+  "name": "node-red-contrib-automation-controller",
   "version": "1.0.0",
   "description": "A Node-RED automation controller",
   "repository": {
@@ -18,7 +18,7 @@
   ],
   "node-red": {
     "nodes": {
-      "switchBreak": "automationController.js"
+      "automationController": "automationController.js"
     }
   },
   "bugs": {
