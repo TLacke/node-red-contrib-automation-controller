@@ -1,0 +1,108 @@
+{
+    "node": {
+        "name":"Automation Controller"
+    },
+    "label": {
+        "name": "Name:",
+        "input": "Input:",
+        "output": "Output:",
+        "match": "When match:",
+        "amatch": "Activate on:",
+        "imatch": "Deactive on:",
+        "repeat": "Repeat:",
+        "cooldown": "Cooldown:",
+        "timeOut": "Time out:",
+        "value": "Value:",
+        "cycle": "Cycle",
+        "init": "Initial value:",
+        "inix": "Initial index:",
+        "steps": "Steps:",
+        "min": "Min:",
+        "max": "Max:",
+        "ipos": "Initially positive",
+        "sup": "Positive steps:",
+        "sdown": "Negative steps:",
+        "enedge": "Ensure edges reached",
+        "index": "index %1:",
+        "delete": "Delete rule",
+        "resetInitial": "Reset to initial value on activation",
+        "sendInactive": "Send on inactive:",
+        "seperated": "Seperated outputs",
+        "triggerActive": "Trigger action on active match while active",
+        "repMsg": "Message on repeat:"
+    },
+    "item": {
+        "name": "Rule name:",
+        "mode": "Output engine:",
+        "modes": {
+            "single": "Single value",
+            "iterate": "Iterate value",
+            "bounce": "Bouncing value",
+            "fixed": "Fixed values"
+        },
+        "match": "Match mode:",
+        "matches": {
+            "event": "Event",
+            "state": "State"
+        },
+        "behavior": "Behavior:",
+        "behave": {
+            "sng": "Allow only single action",
+            "mul": "Allow all actions",
+            "can": "Cancel ongoing actions"
+        },
+        "dup_match": "Dupplicated match against rule '%1'",
+
+        "else": "otherwise",
+        "nothing": "nothing",
+        "original": "original message",
+        "latest": "latest message",
+        "latestRule": "latest rule message",
+        "custom": "Custom message"
+    },
+    "tabs": {
+        "default": "default",
+        "add": "Create"
+    },
+    "date": {
+        "time":{
+            "ms": "milliseconds",
+            "s": "seconds",
+            "m": "minutes",
+            "h": "hours",
+            "d": "days"
+        },
+        "days": {
+            "0": "Monday",
+            "1": "Tuesday",
+            "2": "Wednesday",
+            "3": "Thursday",
+            "4": "Friday",
+            "5": "Saturday",
+            "6": "Sunday"
+        },
+        "every": "Every:",
+        "between": "Between:",
+        "and": "and",
+        "on": "on"
+    },
+    "text": {
+        "name": "name",
+        "unknown": "no director link"
+    },
+    "status": {
+        "active":"active",
+        "inactive":"inactive",
+        "locked":"locked",
+        "unlocked":"unlocked",
+        "na":"untouched"
+    },
+    "error": {
+        "invalidMsg": "Invalid message.",
+        "invalidIdx": "Invalid index",
+        "invalidInit": "Invalid initial value",
+        "stepVal": "Invalid step value",
+        "minVal": "Invalid min value",
+        "maxVal": "Invalid max value"
+    }
+}

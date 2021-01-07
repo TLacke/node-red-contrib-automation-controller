@@ -1,0 +1,783 @@
+<script type="text/html" data-template-name="automation controller">
+    <!-- name -->
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> <span data-i18n="label.name"></span></label>
+        <input type="text" id="node-input-name" data-i18n="[placeholder]text.name">
+    </div>
+    
+    <!-- in value -->
+    <div class="form-row">
+        <label for="node-input-inputValue" data-i18n="label.input"></label>
+        <input type="text" id="node-input-inputValue" style="width:70%">
+        <input type="hidden" id="node-input-inputType">
+    </div>
+
+    <!-- behavior -->
+    <div class="form-row">
+        <label for="node-rule-behavior" data-i18n="item.behavior"></label>
+        <select style="width:70%" id="node-rule-behavior">
+            <option value="sng" data-i18n="item.behave.sng"></option>
+            <option value="mul" data-i18n="item.behave.mul"></option>
+            <option value="can" data-i18n="item.behave.can"></option>
+        </select>
+    </div>
+    
+    <!-- seperate outputs -->
+    <div class="form-row">
+        <label for="node-input-seperated">&nbsp;</label>
+        <label style="width:70%">
+            <input id="node-input-seperated" type="checkbox" style="display:inline-block; width:15px; vertical-align:baseline;">
+            <span data-i18n="label.seperated"></span>
+            <input type="hidden" id="node-input-outputs" value="1">
+        </label>
+    </div>
+
+    <!-- tabs -->
+    <span id="rules" class="button-group"><button id="rules-create" type="button" class="red-ui-button toggle rules-group">+</button></span>
+    
+    <!-- name -->
+    <div class="form-row" style="margin-top: 10px">
+        <label for="node-rule-name" data-i18n="item.name"></label>
+        <input type="text" id="node-rule-name">
+    </div>
+
+    <!-- match mode -->
+    <div class="form-row">
+        <label for="node-rule-matchMode" data-i18n="item.match"></label>
+        <select style="width:70%" id="node-rule-matchMode">
+            <option value="event" data-i18n="item.matches.event"></option>
+            <option value="state" data-i18n="item.matches.state"></option>
+        </select>
+    </div>
+    
+    <!-- active -->
+    <div class="form-row">
+        <label id="node-rule-activeLbl" for="node-rule-active" data-i18n="label.amatch"></label>
+        <input type="text" id="node-rule-active" style="width:70%">
+    </div>
+    
+    <!-- inactive -->
+    <div class="form-row" id="node-inactiveRow">
+        <label for="node-rule-inactive" data-i18n="label.imatch"></label>
+        <input type="text" id="node-rule-inactive" style="width:70%">
+    </div>
+    
+    <!-- cool down -->
+    <div class="form-row" id="node-cool">
+        <label for="node-rule-cool-time"><i class="fa fa-stop-circle-o"></i> <span data-i18n="label.cooldown"></span></label>
+        <input id="node-rule-cool-time" type="number" style="width: 70px">
+        <select style="width:150px" id="node-rule-cool-unit">
+            <option value="ms" data-i18n="date.time.ms"></option>
+            <option value="s" data-i18n="date.time.s"></option>
+            <option value="m" data-i18n="date.time.m"></option>
+            <option value="h" data-i18n="date.time.h"></option>
+            <option value="d" data-i18n="date.time.d"></option>
+        </select><br/>
+    </div>
+
+    <!-- timeout -->
+    <div class="form-row" id="node-toRow">
+        <label for="node-rule-timeOut-time"><i class="fa fa-stop-circle-o"></i> <span data-i18n="label.timeOut"></span></label>
+        <input id="node-rule-timeOut-time" type="number" style="width: 70px">
+        <select style="width:150px" id="node-rule-timeOut-unit">
+            <option value="ms" data-i18n="date.time.ms"></option>
+            <option value="s" data-i18n="date.time.s"></option>
+            <option value="m" data-i18n="date.time.m"></option>
+            <option value="h" data-i18n="date.time.h"></option>
+            <option value="d" data-i18n="date.time.d"></option>
+        </select><br/>
+    </div>
+    
+    <!-- trigger -->
+    <div class="form-row" id="node-triggerActive">
+        <label for="node-rule-triggerActive">&nbsp;</label>
+        <label style="width:70%">
+            <input id="node-rule-triggerActive" type="checkbox" style="display:inline-block; width:15px; vertical-align:baseline;">
+            <span data-i18n="label.triggerActive"></span>
+        </label>
+    </div>
+
+    <!-- repeat message -->
+    <div class="form-row" id="node-repMsg">
+        <label for="node-rule-repMsg" data-i18n="label.repMsg"></label>
+        <input type="text" id="node-rule-repMsg" style="width:70%">
+    </div>
+    
+    <!-- repeat -->
+    <div class="form-row" id="node-timeRow">
+        <label for="node-rule-repeat-time"><i class="fa fa-repeat"></i> <span data-i18n="label.repeat"></span></label>
+        <input id="node-rule-repeat-time" type="number" style="width: 70px">
+        <select style="width:150px" id="node-rule-repeat-unit">
+            <option value="ms" data-i18n="date.time.ms"></option>
+            <option value="s" data-i18n="date.time.s"></option>
+            <option value="m" data-i18n="date.time.m"></option>
+            <option value="h" data-i18n="date.time.h"></option>
+            <option value="d" data-i18n="date.time.d"></option>
+        </select><br/>
+    </div>
+    
+    <!-- active -->
+    <div class="form-row" id="node-onInactive">
+        <label for="node-rule-onInactive" data-i18n="label.sendInactive"></label>
+        <input type="text" id="node-rule-onInactive" style="width:70%">
+    </div>
+    
+    <!-- reset -->
+    <div class="form-row" id="node-resetInitial">
+        <label for="node-rule-resetInitial">&nbsp;</label>
+        <label style="width:70%">
+            <input id="node-rule-resetInitial" type="checkbox" style="display:inline-block; width:15px; vertical-align:baseline;">
+            <span data-i18n="label.resetInitial"></span>
+        </label>
+    </div>
+    
+    <!-- out value -->
+    <div class="form-row">
+        <label for="node-rule-output" data-i18n="label.output"></label>
+        <input type="text" id="node-rule-output" style="width:70%">
+    </div>
+
+    <!-- mode -->
+    <div class="form-row">
+        <label for="node-rule-mode" data-i18n="item.mode"></label>
+        <select style="width:70%" id="node-rule-mode">
+            <option value="single" data-i18n="item.modes.single"></option>
+            <option value="iterate" data-i18n="item.modes.iterate"></option>
+            <option value="bounce" data-i18n="item.modes.bounce"></option>
+            <option value="fixed" data-i18n="item.modes.fixed"></option>
+        </select>
+    </div>
+
+    <div class="rules red-ui-editableList-border" style="margin-bottom: 10px; padding: 5px">
+        <!-- rule: single -->
+        <div id="rules-single">
+            <div class="form-row">
+                <label for="node-rule-sValue" data-i18n="label.value"></label>
+                <input id="node-rule-sValue" type="text">
+            </div>
+        </div>
+
+        <!-- rule: iterate -->
+        <div id="rules-iterate">
+            <div class="form-row">
+                <label for="node-rule-iInit" data-i18n="label.init"></label>
+                <input id="node-rule-iInit" type="text">
+            </div>
+            <div class="form-row">
+                <label for="node-rule-iMin" data-i18n="label.min"></label>
+                <input id="node-rule-iMin" type="text">
+            </div>
+            <div class="form-row">
+                <label for="node-rule-iMax" data-i18n="label.max"></label>
+                <input id="node-rule-iMax" type="text">
+            </div>
+            <div class="form-row">
+                <label for="node-rule-iSteps" data-i18n="label.steps"></label>
+                <input id="node-rule-iSteps" type="text">
+            </div>
+            <div class="form-row">
+                <label for="node-rule-iCycle">&nbsp;</label>
+                <label style="width:70%">
+                    <input id="node-rule-iCycle" type="checkbox" style="display:inline-block; width:15px; vertical-align:baseline;">
+                    <span data-i18n="label.cycle"></span>
+                </label>
+            </div>
+            
+            <div class="form-row">
+                <label for="node-rule-iEdge">&nbsp;</label>
+                <label style="width:70%">
+                    <input id="node-rule-iEdge" type="checkbox" style="display:inline-block; width:15px; vertical-align:baseline;">
+                    <span data-i18n="label.enedge"></span>
+                </label>
+            </div>
+        </div>
+
+        <!-- rule: bounce -->
+        <div id="rules-bounce">
+            <div class="form-row">
+                <label for="node-rule-bInit" data-i18n="label.init"></label>
+                <input id="node-rule-bInit" type="text">
+            </div>
+            <div class="form-row">
+                <label for="node-rule-bIPos">&nbsp;</label>
+                <label style="width:70%">
+                    <input id="node-rule-bIPos" type="checkbox" style="display:inline-block; width:15px; vertical-align:baseline;">
+                    <span data-i18n="label.ipos"></span>
+                </label>
+            </div>
+            <div class="form-row">
+                <label for="node-rule-bMin" data-i18n="label.min"></label>
+                <input id="node-rule-bMin" type="text">
+            </div>
+            <div class="form-row">
+                <label for="node-rule-bMax" data-i18n="label.max"></label>
+                <input id="node-rule-bMax" type="text">
+            </div>
+            <div class="form-row">
+                <label for="node-rule-bUp" data-i18n="label.sup"></label>
+                <input id="node-rule-bUp" type="text">
+            </div>
+            <div class="form-row">
+                <label for="node-rule-bDown" data-i18n="label.sdown"></label>
+                <input id="node-rule-bDown" type="text">
+            </div>
+            
+            <div class="form-row">
+                <label for="node-rule-bEdge">&nbsp;</label>
+                <label style="width:70%">
+                    <input id="node-rule-bEdge" type="checkbox" style="display:inline-block; width:15px; vertical-align:baseline;">
+                    <span data-i18n="label.enedge"></span>
+                </label>
+            </div>
+    </div>
+
+        <!-- rule: fixed -->
+    <div id="rules-fixed">
+            <div class="form-row">
+                <label for="node-rule-fInit" data-i18n="label.inix"></label>
+                <input id="node-rule-fInit" type="text">
+            </div>
+            
+            <div class="form-row">
+                <label for="node-rule-fValues">&nbsp;</label>
+                <div id="node-rule-fValues" style="display: inline-block; background-color: #eee; border: 1px solid #ccc; border-bottom: 0px none"></div>
+            </div>
+            <div class="form-row">
+                <label for="node-rule-fadd">&nbsp;</label>
+                <button id="node-rule-fadd">+</button>
+            </div>
+            <div class="form-row">
+                <label for="node-rule-fCycle">&nbsp;</label>
+                <label style="width:70%">
+                    <input id="node-rule-fCycle" type="checkbox" style="display:inline-block; width:15px; vertical-align:baseline;">
+                    <span data-i18n="label.cycle"></span>
+                </label>
+            </div>
+        </div>
+    </div>
+    
+    <!-- delete -->
+    <div class="form-row">
+        <label for="node-rule-delete">&nbsp;</label>
+        <button id="node-rule-delete" class="red-ui-button primary" data-i18n="label.delete"></button>
+    </div>
+</script>
+
+<script type="text/javascript">
+(function() {
+    const MAX_TABS = 10;
+    const MODES = ["single", "iterate", "bounce", "fixed"];
+    const defRule = {
+        resetInitial: true,
+        
+        matchMode: 'event',
+        active: 'active',     activeType: 'str',
+        inactive: 'inactive', inactiveType: 'str',
+        onInactive: '',       onInactiveType: 'nul',
+        triggerActive: true,
+        mode: 'iterate',
+        output: 'payload', outputType: 'msg',
+        repMsg: '',     repMsgType: 'payl',
+        cool: 0,        coolType: 'ms',
+        rep: 500,       repType: 'ms',
+        to: 60,         toType: 's',
+        sValue: '1',    sValueType: 'num',
+
+        iInit: '0',     iInitType: 'num',
+        iMin: '0',      iMinType: 'num',
+        iMax: '255',    iMaxType: 'num',
+        iSteps: '1',    iStepsType: 'num',
+        iCycle: true,
+        iEdge: false,
+
+        bInit: '0',     bInitType: 'num',
+        bIPos: true,
+        bMin: '0',      bMinType: 'num',
+        bMax: '255',    bMaxType: 'num',
+        bUp: '1',       bUpType: 'num',
+        bDown: '1',     bDownType: 'num',
+        bEdge: true,
+
+        fInit: '0',     fInitType: 'num',
+        fValues: [ {v:'0', t:'num'} ],
+        fCycle: true
+    };
+    
+    var selectedRule = 0;
+       
+    function addFixedRow(node,v,t) {
+        var pa = $('#node-rule-fValues');
+
+        var freeId = getFreeRuleId('#node-rule-fValues', 'node-rule-fField');
+        if (v===undefined) {
+            v = freeId;
+            t = 'num';
+        }
+
+        var e = document.createElement('div');
+        var s = document.createElement('label');
+        var i = document.createElement('input');
+        var r = document.createElement('button');
+
+        e.style.whiteSpace = "nowrap";
+        s.innerText = node._("label.index").replaceAll('%1', pa.children().length);
+
+        e.id = 'node-rule-fField' + freeId;
+        e.style.paddingTop = '8px';
+        e.style.paddingBottom = '8px';
+        e.style.borderBottom = '1px solid #ccc';
+        e.style.width = "330px";
+        i.style.width = "200px";
+        i.id = 'node-rule-fValue' + freeId;
+        i.type = 'text';
+        i.value = v;
+        r.innerText = '-';
+        r.onclick = me=>removeFixedRow(e);
+
+        e.append(s);
+        e.append(' ');
+        e.append(i);
+        e.append(r);
+        pa.append(e);
+
+        $(i).typedInput({default:'num',types:['msg','flow','global','str','num','bool','json','bin','date','jsonata','env']});
+        $(i).typedInput('value', v);
+        $(i).typedInput('type', t);
+    }
+
+    function removeFixedRow(re) {
+        var pa = document.getElementById('node-rule-fValues');
+        pa.removeChild(re);
+
+        for (var i = pa.children.length - 1; i >= 0; i--) {
+            pa.children[i].children[0].innerText = 'Value ' + i +':';
+        }
+    }
+
+
+
+    function getFreeRuleId(p,c) {
+        var o = [];
+        $(p).children().each((idx, e) => o.push( parseInt(e.id.replace(c,'')) ) );
+        
+        var i = 0;
+        while (i < o.length) {
+            if (o.indexOf(i) == -1)
+                return i;
+            i++;
+        }
+
+        return i;
+    }
+
+    function findRule(node, id) {
+        return (node.nrules || []).find(itm=> itm.id==id || itm.eid==id);
+   }
+
+    function createTab(node, selected) {
+        var id = getFreeRuleId('#rules', 'rules-custom');
+        var rule = Object.assign({
+            id: id,
+            rid: 100000+Math.floor(Math.random() * 1000000),
+            eid:'rules-custom' + id,
+            name: 'rule ' + id
+        }, defRule);
+
+        // Add output
+        var currentOutputs = JSON.parse(node.outputCount.val()||"{}");
+        currentOutputs[rule.rid] = node.nrules.length;
+        node.outputCount.val(JSON.stringify(currentOutputs));
+        
+        // Connect and add rule
+        node.nrules.push(rule);
+        addTab(node, rule, selected);
+    }
+
+    function addTab(node, rule, selected, beforeElem) {
+        var e = document.createElement('button');
+        e.id = rule.eid;
+        e.className = 'red-ui-button toggle rules-group';
+        
+        var img = document.createElement('i');
+        var lbl = document.createElement('span');
+        img.className = 'fa fa-expand';
+        lbl.innerText = rule.name;
+        e.append(img);
+        e.append(' ');
+        e.append(lbl);
+        
+        $(e).on('click', function() {
+            selectTab(node, this);
+        });
+
+        if (!!beforeElem)
+            beforeElem = $(beforeElem);
+        else
+            beforeElem = $("#rules-create");
+        
+        beforeElem.before(e);
+
+        if (selected !== false)
+            selectTab(node,e);
+
+        // Hide + on max
+        if (beforeElem.parent().children().length > MAX_TABS)
+            $("#rules-create").hide();
+        $("#node-rule-delete").show();
+    }
+
+    function removeTab(node, rule) {
+        var idx = -1;
+        for (var i = 0; i < node.nrules.length; i++) {
+            if (rule === node.nrules[i]) {
+                idx = i;
+                break;
+            }
+        }
+        
+        if (idx == -1) {
+            RED.notify('Invalid index, rule not found?',"error");
+            return;
+        }
+        
+        node.nrules.splice(idx, 1);
+        if (idx >= node.nrules.length) idx=node.nrules.length - 1;
+        
+        $('#' + rule.eid).remove();
+        selectTab(node, document.getElementById(node.nrules[idx].eid));
+
+        // Remove output
+        var currentOutputs = JSON.parse(node.outputCount.val()||"{}");
+        var n = -1;
+        for (var i=0; i<node.nrules.length; i++) {
+            currentOutputs[node.nrules[i].rid] = ++n;
+        }
+        currentOutputs[rule.rid] = -1;
+        node.outputCount.val(JSON.stringify(currentOutputs));
+        
+        $("#rules-create").show();
+        if ($("#rules-create").parent().children().length < 3)
+            $("#node-rule-delete").hide();
+    }
+
+    function selectTab(node, e) {
+        $(".rules-group").removeClass("selected");
+        $(e).addClass("selected");
+
+        saveData(node);
+        selectedRule = findRule(node, e.id);
+        loadData(node);
+
+        updateMatchMode(node);
+    }
+
+    function updateCurrentTab(node) {
+        var e = document.getElementById(selectedRule.eid);
+        const MODES = {event: 'fa-compress', state: 'fa-expand'};
+        
+        e.children[0].className = 'fa ' + MODES[$('#node-rule-matchMode').val()];
+        e.children[1].innerText = $('#node-rule-name').val();
+
+        if ($('#node-rule-iCycle').is(":checked")) {
+            $('#node-rule-iMin').show();
+        } else {
+            $('#node-rule-iMin').hide();
+        }
+    }
+
+    function updateMatchMode(node) {
+        var v = $('#node-rule-matchMode').val();
+        switch (v) {
+        case 'event':
+            $('#node-cool').show();
+            $('#node-inactiveRow').hide();
+            $('#node-triggerActive').hide();
+            $('#node-toRow').hide();
+            $('#node-timeRow').hide();
+            $('#node-resetInitial').hide();
+            $('#node-onInactive').hide();
+            $('#node-repMsg').hide();
+            $('#node-rule-activeLbl').text(node._('label.match'));
+            break;
+            
+            case 'state':
+            $('#node-cool').hide();
+            $('#node-inactiveRow').show();
+            $('#node-triggerActive').show();
+            $('#node-toRow').show();
+            $('#node-timeRow').show();
+            $('#node-resetInitial').show();
+            $('#node-onInactive').show();
+            $('#node-repMsg').show();
+            $('#node-rule-activeLbl').text(node._('label.amatch'));
+            break;
+        }
+
+        updateCurrentTab(node);
+    }
+
+    function read(id, rule, check) {
+        if (check !== true) {
+            $('#node-rule-' + id).typedInput('type', 'str' );
+            $('#node-rule-' + id).typedInput('value', '' );
+
+            $('#node-rule-' + id).typedInput('type', rule[id + 'Type'] || 'num' );
+            $('#node-rule-' + id).typedInput('value', rule[id] || '' );
+        } else {
+            $('#node-rule-' + id).prop("checked", rule[id] );
+        }
+    }
+    
+    function write(id, rule, check) {
+        var b = rule[id], bt=rule[id+'Type'];
+        if (check !== true) {
+            rule[id + 'Type'] = $('#node-rule-' + id).typedInput('type');
+            rule[id] = $('#node-rule-' + id).typedInput('value');
+        } else {
+            rule[id] = $('#node-rule-' + id).prop("checked");
+        }
+    }
+
+    function loadData(node, rule) {
+        if (!rule)
+            rule = selectedRule;
+        
+        $('#node-rule-name').val(rule.name);
+        $('#node-rule-matchMode').val(rule.matchMode);
+        $('#node-rule-mode').val(rule.mode);
+        updateMode(rule.mode);
+
+        read('output', rule);
+        read('active', rule);
+        read('inactive', rule);
+        read('triggerActive', rule, true);
+        read('resetInitial', rule, true);
+        read('onInactive', rule);
+        read('repMsg', rule);
+
+        read('sValue', rule);
+        
+        read('iInit', rule);
+        read('iMin', rule);
+        read('iMax', rule);
+        read('iSteps', rule);
+        read('iCycle', rule, true);
+        read('iEdge', rule, true);
+        
+        read('bInit', rule);
+        read('bIPos', rule, true);
+        read('bMin', rule);
+        read('bMax', rule);
+        read('bUp', rule);
+        read('bDown', rule);
+        read('bEdge', rule, true);
+        
+        read('fInit', rule);
+        read('fCycle', rule, true);
+
+        $('#node-rule-fValues').empty();
+        (rule.fValues || []).forEach( v => addFixedRow(node, v.v, v.t) );
+
+        $('#node-rule-cool-time').val(rule.cool);
+        $('#node-rule-cool-unit').val(rule.coolType);
+
+        $('#node-rule-timeOut-time').val(rule.to);
+        $('#node-rule-timeOut-unit').val(rule.toType);
+
+        $('#node-rule-repeat-time').val(rule.rep);
+        $('#node-rule-repeat-unit').val(rule.repType);
+    }
+
+    function saveData(node, rule) {
+        if (!rule)
+            rule = selectedRule;
+
+        if (!rule)
+            return;
+        
+        rule.name = $('#node-rule-name').val();
+        rule.matchMode = $('#node-rule-matchMode').val();
+        rule.mode = $('#node-rule-mode').val();
+
+        write('output', rule);
+        write('active', rule);
+        write('inactive', rule);
+        write('triggerActive', rule, true);
+        write('resetInitial', rule, true);
+        write('onInactive', rule);
+        write('repMsg', rule);
+
+        write('sValue', rule);
+        
+        write('iInit', rule);
+        write('iMin', rule);
+        write('iMax', rule);
+        write('iSteps', rule);
+        write('iCycle', rule, true);
+        write('iEdge', rule, true);
+        
+        write('bInit', rule);
+        write('bIPos', rule, true);
+        write('bMin', rule);
+        write('bMax', rule);
+        write('bUp', rule);
+        write('bDown', rule);
+        write('bEdge', rule, true);
+        
+        write('fInit', rule);
+        write('fCycle', rule, true);
+        
+        rule.fValues = [];
+        $('#node-rule-fValues').children().each((idx,e)=>{
+            e = $('#node-rule-fValue' + e.id.replace('node-rule-fField', ''));
+            rule.fValues.push({
+                v: e.typedInput('value'),
+                t: e.typedInput('type')
+            });
+        });
+
+        rule.cool = $('#node-rule-cool-time').val();
+        rule.coolType = $('#node-rule-cool-unit').val();
+
+        rule.to = $('#node-rule-timeOut-time').val();
+        rule.toType = $('#node-rule-timeOut-unit').val();
+
+        rule.rep = $('#node-rule-repeat-time').val();
+        rule.repType = $('#node-rule-repeat-unit').val();
+    }
+
+    function updateMode(e) {
+        if (!!e.target) e = e.target.value;
+        
+        // Show the correct mode components.
+        MODES.forEach( m => (e==m)?$('#rules-'+m).show():$('#rules-'+m).hide() );
+    }
+
+    function updateOutputs(node, upr) {
+        var mout = $("#node-input-seperated").is(":checked");
+
+        var outs = {};
+        if (mout) {
+            for (var i = 0; i < node.nrules.length; i++) {
+                if (upr) node.nrules[i].rid = i;
+                outs[node.nrules[i].rid] = i;
+            }
+        } else {
+            outs[0] = 0;
+        }
+        
+        node.outputCount = $("#node-input-outputs").val(JSON.stringify(outs));
+    }
+
+    RED.nodes.registerType('automation controller', {
+        category: 'function',
+        color:"#a6cb6f",
+        defaults: {
+            name: {value:"" },
+            inputType: {value:"msg"},
+            inputValue: {value:"payload", validate: RED.validators.typedInput("inputType")},
+            repeatMsg: {value:"lat"},
+            seperated: {value:true},
+            behavior: {value:"mul"},
+            rules:{value:[]},
+            outputs: {value:1}
+        },
+        align:"right",
+        inputs:1,
+        outputs:1,
+        icon: "font-awesome/fa-hand-paper-o",
+        outputLabels: function(i) {
+            return this.seperated ? this.rules[i].name : "output";
+        },
+        label: function() {
+            return this.name||this._("node.name");
+        },
+        labelStyle: function() {
+            return this.name?"node_label_italic":"";
+        },
+        oneditprepare: function() {
+            var node = this;
+            
+            $("#node-input-inputValue").typedInput({
+                type:"msg",
+                types:["msg","flow","global","env"],
+                typeField: "#node-input-inputType"
+            });
+
+            $('#node-rule-behavior').val(this.behavior);
+
+            var optionNothing = {value:"nul",label:this._("item.nothing"),hasValue:false};
+            var optionOriginal = {value:"pay",label:this._("item.original"),hasValue:false};
+            var optionLatest = {value:"payl",label:this._("item.latest"),hasValue:false};
+            var optionRule = {value:"payr",label:this._("item.latestRule"),hasValue:false};
+            
+            // Setup fields
+            $("#node-rule-output").typedInput(    { default:"msg", types:['msg'] });
+            $("#node-rule-active").typedInput(    { default:"str", types:['msg','flow','global','str','num','bool','json','bin','date','jsonata','env'] });
+            $("#node-rule-inactive").typedInput(  { default:"str", types:['msg','flow','global','str','num','bool','json','bin','date','jsonata','env'] });
+            $("#node-rule-onInactive").typedInput(  { default:"str", types:['msg','flow','global','str','num','bool','json','bin','date','jsonata','env',optionNothing] });
+            $("#node-rule-repMsg").typedInput(  { default:'payl', types:['json',optionOriginal,optionRule,optionLatest] });
+            
+            $("#node-rule-sValue").typedInput({ default:"num", types:['msg','flow','global','str','num','bool','json','bin','date','jsonata','env'] });
+
+            $("#node-rule-iInit").typedInput( { default:"num", types:['num','msg','flow','global','env'] });
+            $("#node-rule-iMin").typedInput(  { default:"num", types:['num','msg','flow','global','env'] });
+            $("#node-rule-iMax").typedInput(  { default:"num", types:['num','msg','flow','global','env'] });
+            $("#node-rule-iSteps").typedInput({ default:"num", types:['num','msg','flow','global','env'] });
+            
+            $("#node-rule-bInit").typedInput( { default:"num", types:['num','msg','flow','global','env'] });
+            $("#node-rule-bMin").typedInput(  { default:"num", types:['num','msg','flow','global','env'] });
+            $("#node-rule-bMax").typedInput(  { default:"num", types:['num','msg','flow','global','env'] });
+            $("#node-rule-bUp").typedInput(   { default:"num", types:['num','msg','flow','global','env'] });
+            $("#node-rule-bDown").typedInput( { default:"num", types:['num','msg','flow','global','env'] });
+            
+            $("#node-rule-fInit").typedInput( { default:"num", types:['num','msg','flow','global','env'] });
+            
+
+            // Connect listeners
+            $('#node-rule-iCycle').on('change', ev=>updateCurrentTab(node));
+            $('#node-rule-name').on('change', ev=>updateCurrentTab(node));
+            $('#node-rule-matchMode').on('change', ev=>updateMatchMode(node));
+
+            $('#node-rule-mode').on('change', updateMode);
+            $("#node-rule-fadd").on('click', ()=>addFixedRow(node));
+            $("#node-rule-delete").on('click', ()=>removeTab(node, selectedRule));
+            
+            // Prepare new rules (will be applied to "rules" when saving)
+            node.nrules = Object.assign(!!node.rules ? node.rules.slice() : []);
+
+            // Add previous tabs
+            $("#rules-create").show();
+            $("#node-rule-delete").hide();
+
+            // Add tabs
+            for (var i = 0; i < node.nrules.length; i++)
+                addTab(node, node.nrules[i], i==0);
+            
+            updateOutputs(node, true);
+            $("#node-input-seperated").on("click", () => updateOutputs(node, false));
+
+            if (node.nrules.length == 0)
+                createTab(node, true);
+
+            // Connect create new tab
+            $("#rules-create").on("click", () => createTab(node) );
+            updateMatchMode(node);
+        },
+        oneditsave: function() {
+            this.behavior = $('#node-rule-behavior').val();
+            saveData(this);
+            
+            delete this.outputCount;
+
+            selectedRule = undefined;
+            this.rules = this.nrules;
+            delete this.nrules;
+        },
+        oneditcancel: function() {
+            selectedRule = undefined;
+            delete this.nrules;
+        }
+    });
+})();
+</script>

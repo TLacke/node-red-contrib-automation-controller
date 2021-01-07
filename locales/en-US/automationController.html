@@ -1,0 +1,235 @@
+<script type="text/html" data-help-name="automationController">
+  <p>
+    The automation controller enables multiple inputs like the switch node but enables multiple different output values.
+    Each input model can be configured on it's own to enable one component to handle multiple complex inputs and process the data to send out a more generic model.
+
+    The main purpose of this node has been to enable buttons/inputs to convert into a numeric output ranged value, but can with the use of single or fixed mode also other values.
+    Like a button <i>(input)</i> and a <i>light</i> when:
+    <ul>
+      <li><i>If clicked:</i> The light should be toggled between 0 and 50.</li>
+      <li><i>If hold:</i> It should slowly be raised from 0 to 255.</li>
+      <li><i>If double clicked:</i> It should be set to 255.</li>
+    </ul>
+  </p>
+
+  <p>
+    There can be up to 10 different rules in this node where each one can be either a:
+    <ul>
+      <li><code>Event</code>: Will execute directly and then go back to idle state <i>(with the ability to have a cool down period to ensure no spamming occurs)</i>.</li>
+      <li><code>State</code>: Will enter and leave an active state where it will repeatedly send an output value with a defined time interval <i>(with a built it timeout)</i>.</li>
+    </ul>
+  </p>
+
+  <p>
+    The following rule output models are available:
+    <ul>
+      <li><code>Single value</code>, Will send the specified value.</li>
+      <li><code>Iterate value</code>, Will iterate through a range of values and send the next in line. It has the ability to cycle or stop when reaching the end.</li>
+      <li><code>Bouncing value</code>, Like the <code>iterate value</code> but will iterate to max with the positive step value and then switch to using the negative step value till reaching the min value and so on.</li>
+      <li><code>Fixed values</code>, Will send a value from a predefined list. It will loop through the list and send the value of the current index.</li>
+    </ul>
+  </p>
+  <h3>Inputs</h3>
+  <dl class="message-properties">
+    <dt class="optional">Name</dt>
+    <dd>The name of this node. <i>(Will reflect what's shown on the node.)</i>
+    </dd>
+  
+    <dt>Input<span class="property-type">msg.[] | flow.[] | global.[] | env. variable</span></dt>
+    <dd>The field to read and validate against the rule's <code>Match mode</code> <i>(for events)</i> or <code>Activate on</code> and <code>Deactive on</code> <i>(for states)</i></dd>
+    </dd>
+  
+    <dt>Behavior</dt>
+    <dd>How should the node react when an execution occurs.
+        <ul>
+          <li><code>Allow only single action</code>, Will only allow an execution only when the node is idle.</li>
+          <li><code>Allow all actions</code>, Will freely allow executions of any rule no matter while another rule is active or not.</li>
+          <li><code>Cancel ongoing actions</code>, Will abort all ongoing rule executions when a new rule is executed.</li>
+    </dd>
+  
+    <dt>Button list</dt>
+    <dd>Shows all the created rules and a <code style="border:1px solid grey; padding-left:5px; padding-right: 5px">+</code> to create a new rule <i>(with a maximum of 10 rules)</i>.
+    </dd>
+  
+    <dt>Item name</dt>
+    <dd>Sets the name of the currently selected rule.
+    </dd>
+  
+    <dt>Match mode</dt>
+    <dd>Sets the mode of how this rule should function.
+      <ul>
+        <li><code>Event</code>, Will execute and then go back to idle state. <i>(Think of it as a mouse button)</i></li>
+        <li><code>State</code>, Will execute and keeps active until deactivated. <i>(Think of it as a power button or a switch)</i></li>
+      </ul>
+    </dd>
+  
+    <h4>Event</h4>
+    <dl class="message-properties">
+      <dt>When match<span class="property-type">*</span></dt>
+      <dd>The value to match the <code>input</code> field against. When matched, this rule will be executed.
+      </dd>
+    
+      <dt>Cooldown<span class="property-type">milliseconds | seconds | minutes | hours | days</span></dt>
+      <dd>The time to wait before this action can be executed again. <i>(This will also prevent other rules to be executed if <code>behavior</code> is preventing multiple rules.)</i>
+      </dd>
+    </dl>
+  
+    <h4>State</h4>
+    <dl class="message-properties">
+      <dt>Activate on<span class="property-type">*</span></dt>
+      <dd>The value to match the <code>input</code> field against to begin execute the rule.
+      </dd>
+    
+      <dt>Deactivate on<span class="property-type">*</span></dt>
+      <dd>The value to match the <code>input</code> field against to halt/stop the execution of this rule.
+      </dd>
+    
+      <dt>Time out<span class="property-type">milliseconds | seconds | minutes | hours | days</span></dt>
+      <dd>The time to wait before this action can be executed again. <i>(This will also prevent other rules to be executed if <code>behavior</code> is preventing multiple rules.)</i>
+      </dd>
+      
+      <dt>Trigger action on activate...</dt>
+      <dd>If <b>checked</b>, the <code>Activate on</code> match can occur while already active. Otherwise only <code>Deactivate on</code> match will be checked.
+      </dd>
+    
+      <dt>Message on repeat</dt>
+      <dd>The message to use for repeat messages:
+        <ul>
+          <li><code>JSON</code>, a customly specified JSON message to use.</li>
+          <li><code>Original message</code>, The message that triggered the first activation.</li>
+          <li><code>Latest message</code>, The last message that has entered the node.</li>
+        </ul>
+      </dd>
+    
+      <dt>Repeat<span class="property-type">milliseconds | seconds | minutes | hours | days</span></dt>
+      <dd>The time to wait before this action can be executed again. <i>(This will also prevent other rules to be executed if <code>behavior</code> is preventing multiple rules.)</i>
+      </dd>
+    
+      <dt>Send on inactive<span class="property-type">*</span></dt>
+      <dd>The message to send when the state becomes inactive either through <code>Deactive on</code> or the <code>Time out</code>.
+      </dd>
+      
+      <dt>Reset to initial value...</dt>
+      <dd>If <b>checked</b>, the output mode's current value will be set to its <code>Initial value</code>. <i>(The result depends on the <code>Output mode</code> that is used.)</i>.
+      </dd>
+    </dl>
+    
+    <dt>Output<span class="property-type">msg.[]</span></dt>
+    <dd>The field to be updated with the result of the execution. <i>(To allow multiple rules to be executed on the same input, this field is unique per rule)</i>
+    </dd>
+
+    <dt>Output engine</dt>
+    <dd>Tells how the output should react and work:
+      <ul>
+        <li><code>Single value</code>, Sends a simple value.</li>
+        <li><code>Iterate value</code>, Loops <i>(or just raises)</i> from low to high integer values.</li>
+        <li><code>Bouncing value</code>, Bouncing from low to high integer values.</li>
+        <li><code>Fixed values</code>, Uses a predefined list</li>
+      </ul>
+    </dd>
+  
+    <h4>Engine: Single value</h4>
+    <dl class="message-properties">
+      <dt>Value<span class="property-type">*</span></dt>
+      <dd>The value to send out to the <code>output</code> field.
+      </dd>
+    </dl>
+    
+    <h4>Engine: Iterate value</h4>
+    <dl class="message-properties">
+      <dt>Initial value<span class="property-type">number | msg.[] | flow.[] | global.[] | env. var</span></dt>
+      <dd>The initial value to use for first execution or when being reset <i>(either by <code>Reset to initial..</code> or by message input, <code>msg.state='reset'</code>)</i>.
+        <i>This value must resolve into an integer number.</i>
+      </dd>
+    
+      <dt>Min<span class="property-type">number | msg.[] | flow.[] | global.[] | env. var</span></dt>
+      <dd>The minimum value to use when cycling through the value. <i>(Must resolve into an integer value less than <code>max</code> value)</i>
+      </dd>
+    
+      <dt>Max<span class="property-type">number | msg.[] | flow.[] | global.[] | env. var</span></dt>
+      <dd>The maximum value to use. <i>(Must resolve into an integer value greater than <code>min</code> and <code>initial</code> value)</i><br>
+        When this value is reached, the loop will either stop executing <i>(if not to <code>cycle</code>)</i> or move to the <code>min</code> value <i>(if to <code>cycle</code>)</i>.
+      </dd>
+    
+      <dt>Steps<span class="property-type">number | msg.[] | flow.[] | global.[] | env. var</span></dt>
+      <dd>The number of jumps to add to the current value for each iteration/execution. <i>(Must resolve into a positive integer value)</i><br>
+      </dd>
+    
+      <dt>Cycle</dt>
+      <dd>If checked, the value will cycle to min value when reached the max. Otherwise, the execution of the rule will be prevented.
+      </dd>
+    
+      <dt>Ensure edges reached</dt>
+      <dd>If checked, the value will ensure that the max value is sent if the value reached beyond the max value <i>(if steps is greater than 1 it might end up in max+X)</i>.
+        And if cycle is checked, the min value will be set <i>(instead of "curValue - (max-min)")</i>.
+      </dd>
+    </dl>
+    
+    <h4>Engine: Bouncing value</h4>
+    <dl class="message-properties">
+      <dt>Initial value<span class="property-type">number | msg.[] | flow.[] | global.[] | env. var</span></dt>
+      <dd>The initial value to use for first execution or when being reset <i>(either by <code>Reset to initial..</code> or by message input, <code>msg.state='reset'</code>)</i>.
+        <i>This value must resolve into an integer number.</i>
+      </dd>
+    
+      <dt>Min<span class="property-type">number | msg.[] | flow.[] | global.[] | env. var</span></dt>
+      <dd>The minimum value to use. <i>(Must resolve into an integer value less than <code>max</code> value)</i><br>
+        When this value is reached, the iteration will turn to use the <code>Positive steps</code>.
+      </dd>
+    
+      <dt>Max<span class="property-type">number | msg.[] | flow.[] | global.[] | env. var</span></dt>
+      <dd>The maximum value to use. <i>(Must resolve into an integer value greater than <code>min</code>)</i><br>
+        When this value is reached, the iteration will turn to use the <code>Negative steps</code>.
+      </dd>
+      
+      <dt>Positive steps<span class="property-type">number | msg.[] | flow.[] | global.[] | env. var</span></dt>
+      <dd>The number of jumps to add to the current value for each iteration/execution while in the positive mode. <i>(Must resolve into a positive integer value)</i>
+      </dd>
+      
+      <dt>Negative steps<span class="property-type">number | msg.[] | flow.[] | global.[] | env. var</span></dt>
+      <dd>The number of jumps to subtract from the current value for each iteration/execution while in the negative mode. <i>(Must resolve into a positive integer value and will automatically be converted to a negative value)</i>
+      </dd>
+      
+      <dt>Ensure edges reached</dt>
+      <dd>If checked, the value will ensure that the max value is sent if the value reached beyond the max value <i>(if steps is greater than 1 it might end up in <code>max</code>+(X-1) or <code>min</code>-(X-1) and will be converted to just <code>min</code>/<code>max</code>.)</i>.
+      </dd>
+    </dl>
+    
+    <h4>Engine: Fixed values</h4>
+    <dl class="message-properties">
+      <dt>Initial index<span class="property-type">number | msg.[] | flow.[] | global.[] | env. var</span></dt>
+      <dd>The initial index to use for first execution or when being reset <i>(either by <code>Reset to initial..</code> or by message input, <code>msg.state='reset'</code>)</i>.
+        This value must resolve into a positive integer number matching one of the items <i>(First record starts on zero)</i>
+      </dd>
+    
+      <dt>Index #<span class="property-type">*</span></dt>
+      <dd>The value to send when current index maches this row.
+      </dd>
+      
+      <dt>- button</dt>
+      <dd>Removes the record of the related row clicked.
+      </dd>
+      
+      <dt>+ button</dt>
+      <dd>Adds a new record to the fixed values.
+      </dd>
+      
+      <dt>Cycle</dt>
+      <dd>If checked, the index will move to the first record when cycled through. Otherwise it will prevent the execution.
+      </dd>
+    </dl>
+  </dl>
+  <h3>Details</h3>
+  <p>The node will listen to an input and execute one or more of the rules depending on operation mode and if matched send out a result of the current state of the <code>output engine</code> that is used for the executed rule.
+  </p>
+  
+  <h3>Special inputs</h3>
+  <p>The <code>msg.state</code> can be used to reset the state of the current <code>output engine</code>.<br>
+    The <code>msg.engineValue</code> can be used to override the current value <i>(before execution, this means that the value will be altered)</i>.
+  </p>
+  
+  <h3>References</h3>
+  <ul>
+    <li><a href="https://github.com/TLacke/node-red-contrib-automation-controller">GitHub</a> - GitHub repository</li>
+  </ul>
+</script>
