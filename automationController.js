@@ -95,6 +95,7 @@ module.exports = function(RED) {
                 hr:undefined,                       // Repeat handler
                 to:getTime(ru.to, ru.toType),       // Timeout
                 co:getTime(ru.cool, ru.coolType),   // Cooldown
+                rs:getTime(ru.resEvent, ru.resEventType), // reset event
                 ht:undefined,                       // Timeout handler
                 t:function(inp,msg,send,res) {      // Test
                     var v,t;
@@ -188,18 +189,30 @@ module.exports = function(RED) {
 
                     // Else if event
                     } else {
-                        // If has time out, then
-                        if (this.a && this.co > 0) {
+                        if (this.a) {
                             // If already active, then abort
                             if (!c) {
                                 return;
                             }
 
-                            this.ht = setTimeout(()=>{
-                                if (this.a) {
-                                    this.e(this.msg, T_TIMEOUT, send);
-                                }
-                            }, this.co);
+                            clearInterval(this.hr);
+                            this.hr = undefined;
+
+                            // If has time out, then
+                            if (this.co > 0) {
+                                this.ht = setTimeout(()=>{
+                                    if (this.a) {
+                                        this.e(this.msg, T_TIMEOUT, send);
+                                    }
+                                }, this.co);
+                            }
+
+                            // If has reset event, then
+                            if (this.rs > 0) {
+                                this.hr = setTimeout(()=>{
+                                    this.v.e(true, false);
+                                }, this.rs);
+                            }
                         }
                     }
                     
@@ -233,7 +246,7 @@ module.exports = function(RED) {
                         }
                     }
 
-                    if (this.a && this.co == 0) {
+                    if (!this.ist && this.a && this.co == 0) {
                         this.a = false;
                         this.msg = undefined;
                     }

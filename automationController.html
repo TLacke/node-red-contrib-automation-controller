@@ -74,6 +74,19 @@
             <option value="d" data-i18n="date.time.d"></option>
         </select><br/>
     </div>
+    
+    <!-- reset timeout -->
+    <div class="form-row" id="node-resEvent">
+        <label for="node-rule-resEvent-time"><i class="fa fa-undo"></i> <span data-i18n="label.resEvent"></span></label>
+        <input id="node-rule-resEvent-time" type="number" style="width: 70px">
+        <select style="width:150px" id="node-rule-resEvent-unit">
+            <option value="ms" data-i18n="date.time.ms"></option>
+            <option value="s" data-i18n="date.time.s"></option>
+            <option value="m" data-i18n="date.time.m"></option>
+            <option value="h" data-i18n="date.time.h"></option>
+            <option value="d" data-i18n="date.time.d"></option>
+        </select><br/>
+    </div>
 
     <!-- timeout -->
     <div class="form-row" id="node-toRow">
@@ -279,6 +292,7 @@
         output: 'payload', outputType: 'msg',
         repMsg: '',     repMsgType: 'payl',
         cool: 0,        coolType: 'ms',
+        resEvent: 0,    resEventType: 'm',
         rep: 500,       repType: 'ms',
         to: 60,         toType: 's',
         sValue: '1',    sValueType: 'num',
@@ -490,6 +504,7 @@
         switch (v) {
         case 'event':
             $('#node-cool').show();
+            $('#node-resEvent').show();
             $('#node-inactiveRow').hide();
             $('#node-triggerActive').hide();
             $('#node-toRow').hide();
@@ -502,6 +517,7 @@
             
             case 'state':
             $('#node-cool').hide();
+            $('#node-resEvent').hide();
             $('#node-inactiveRow').show();
             $('#node-triggerActive').show();
             $('#node-toRow').show();
@@ -581,6 +597,9 @@
         $('#node-rule-cool-time').val(rule.cool);
         $('#node-rule-cool-unit').val(rule.coolType);
 
+        $('#node-rule-resEvent-time').val(rule.resEvent);
+        $('#node-rule-resEvent-unit').val(rule.resEventType);
+
         $('#node-rule-timeOut-time').val(rule.to);
         $('#node-rule-timeOut-unit').val(rule.toType);
 
@@ -638,6 +657,9 @@
 
         rule.cool = $('#node-rule-cool-time').val();
         rule.coolType = $('#node-rule-cool-unit').val();
+
+        rule.resEvent = $('#node-rule-resEvent-time').val();
+        rule.resEventType = $('#node-rule-resEvent-unit').val();
 
         rule.to = $('#node-rule-timeOut-time').val();
         rule.toType = $('#node-rule-timeOut-unit').val();

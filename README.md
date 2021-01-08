@@ -72,6 +72,11 @@ The value to match the **input** field against. When matched, this rule will be 
 
 #### Cooldown
 The time to wait before this action can be executed again. *(This will also prevent other rules to be executed if **behavior** is preventing multiple rules.)*
+*(Zero for disabled)*
+
+#### Reset event timeout
+The time to wait before the rule's current value is reset to the initial.
+*(Zero for disabled)*
 
 
 ### State
@@ -84,6 +89,7 @@ The value to match the **input** field against to halt/stop the execution of thi
 
 #### Time out
 The time to wait before this action can be executed again. *(This will also prevent other rules to be executed if **behavior** is preventing multiple rules.)*
+*(Zero for disabled)*
 
 #### Trigger action on activate...
 If **checked**, the **Activate on** match can occur while already active. Otherwise only **Deactivate on** match will be checked.
@@ -96,6 +102,7 @@ The message to use for repeat messages:
 
 #### Repeat
 The time to wait before this action can be executed again. *(This will also prevent other rules to be executed if **behavior** is preventing multiple rules.)*
+*(Zero for disabled)*
 
 #### Send on inactive
 The message to send when the state becomes inactive either through **Deactive on** or the **Time out**.

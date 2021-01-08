@@ -1,4 +1,4 @@
-<script type="text/html" data-help-name="automationController">
+<script type="text/html" data-help-name="automation controller">
   <p>
     The automation controller enables multiple inputs like the switch node but enables multiple different output values.
     Each input model can be configured on it's own to enable one component to handle multiple complex inputs and process the data to send out a more generic model.
@@ -70,7 +70,13 @@
       </dd>
     
       <dt>Cooldown<span class="property-type">milliseconds | seconds | minutes | hours | days</span></dt>
-      <dd>The time to wait before this action can be executed again. <i>(This will also prevent other rules to be executed if <code>behavior</code> is preventing multiple rules.)</i>
+      <dd>The time to wait before this action can be executed again. <i>(This will also prevent other rules to be executed if <code>behavior</code> is preventing multiple rules.)</i><br>
+      <i>(Zero for disabled)</i>
+      </dd>
+    
+      <dt>Reset event timeout<span class="property-type">milliseconds | seconds | minutes | hours | days</span></dt>
+      <dd>The time to wait before the rule's current value is reset to the initial.<br>
+      <i>(Zero for disabled)</i>
       </dd>
     </dl>
   
@@ -85,7 +91,8 @@
       </dd>
     
       <dt>Time out<span class="property-type">milliseconds | seconds | minutes | hours | days</span></dt>
-      <dd>The time to wait before this action can be executed again. <i>(This will also prevent other rules to be executed if <code>behavior</code> is preventing multiple rules.)</i>
+      <dd>The time to wait before this action can be executed again. <i>(This will also prevent other rules to be executed if <code>behavior</code> is preventing multiple rules.)</i><br>
+      <i>(Zero for disabled)</i>
       </dd>
       
       <dt>Trigger action on activate...</dt>
@@ -102,7 +109,8 @@
       </dd>
     
       <dt>Repeat<span class="property-type">milliseconds | seconds | minutes | hours | days</span></dt>
-      <dd>The time to wait before this action can be executed again. <i>(This will also prevent other rules to be executed if <code>behavior</code> is preventing multiple rules.)</i>
+      <dd>The time to wait before this action can be executed again. <i>(This will also prevent other rules to be executed if <code>behavior</code> is preventing multiple rules.)</i><br>
+      <i>(Zero for disabled)</i>
       </dd>
     
       <dt>Send on inactive<span class="property-type">*</span></dt>
