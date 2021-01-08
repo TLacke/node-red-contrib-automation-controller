@@ -98,9 +98,9 @@ module.exports = function(RED) {
                 ht:undefined,                       // Timeout handler
                 t:function(inp,msg,send,res) {      // Test
                     var v,t;
-                    var a;
-
-                    a = (inp == RED.util.evaluateNodeProperty(this.r.active,this.r.activeType,node,msg));
+                    
+                    var a = (inp == RED.util.evaluateNodeProperty(this.r.active,this.r.activeType,node,msg));
+                    
                     if (a) {
                         updateMsg(this, msg, false);
                     }
@@ -200,11 +200,6 @@ module.exports = function(RED) {
                                     this.e(this.msg, T_TIMEOUT, send);
                                 }
                             }, this.co);
-
-                        } else {
-                            // Mark as done
-                            this.a = false;
-                            this.msg = undefined;
                         }
                     }
                     
@@ -212,7 +207,7 @@ module.exports = function(RED) {
                     
                     var v;
                     
-                    if (this.a || !this.ist) {
+                    if (this.a) {
                         var rv = a==T_ACTIVE && this.ist && this.r.resetInitial;
                         if (!rv && msg!==undefined && msg.state=='reset') rv = true;
 
@@ -228,7 +223,7 @@ module.exports = function(RED) {
                         delete msg.state;
                         delete msg.engineValue;
                         
-                    } else {
+                    } else if (this.ist) {
                         switch (this.r.onInactiveType) {
                             case 'nul':
                                 v = undefined;
@@ -236,6 +231,11 @@ module.exports = function(RED) {
                             default:
                                 v = RED.util.evaluateNodeProperty(this.r.onInactive, this.r.onInactiveType, node, this.msg);
                         }
+                    }
+
+                    if (this.a && this.co == 0) {
+                        this.a = false;
+                        this.msg = undefined;
                     }
                     
                     if (msg !== undefined && v !== undefined) {
@@ -368,7 +368,7 @@ module.exports = function(RED) {
                             this.v = {
                                 r:r,            // Rule
                                 i:function() {  // Initial value
-                                    return Number.parseInt(RED.util.evaluateNodeProperty(this.r.r.bInit, this.r.r.bInitType, node, r.msg));
+                                    return Number.parseInt(RED.util.evaluateNodeProperty(this.r.r.bInit, this.r.r.bInitType, node, this.r.msg));
                                 },
                                 c:undefined,    // Current
                                 p:r.bIPos,      // Positive mode
@@ -445,7 +445,7 @@ module.exports = function(RED) {
                             this.v = {
                                 r:r,            // Rule
                                 i:function() {  // Initial value
-                                    return Number.parseInt(RED.util.evaluateNodeProperty(this.r.r.fInit, this.r.r.fInitType, node, r.msg), 10);
+                                    return Number.parseInt(RED.util.evaluateNodeProperty(this.r.r.fInit, this.r.r.fInitType, node, this.r.msg), 10);
                                 },
                                 c:undefined,    // Current value
                                 v:r.r.fValues,  // values array
@@ -480,7 +480,7 @@ module.exports = function(RED) {
                                     }
 
                                     var v = this.v[this.c];
-                                    return RED.util.evaluateNodeProperty(v.v, v.t, node, r.msg);
+                                    return RED.util.evaluateNodeProperty(v.v, v.t, node, this.r.msg);
                                 }
                             };
                             break;
