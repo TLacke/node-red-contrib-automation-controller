@@ -204,6 +204,7 @@ Some fields has been JavaScript enabled. The engine works the same way in all di
 It contains the following access features:
  * **lastValue**: Contains the latest executed value from all the rules.
  * **lastRuleValue**: Contains the latest executed value from the current rule.
+ * **lastRuleName**: Contains the name of the latest executed rule.
  * **msg**: The active message object.
  * **console**: The console to debug with.
  * **context**: Contains the _get. set, keys, global, flow_ function.

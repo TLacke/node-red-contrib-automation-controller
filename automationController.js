@@ -88,8 +88,9 @@ module.exports = function(RED) {
                 s:{},
                 run: function(name, msg) {
                     this.ctx.msg = msg;
-                    this.ctx.lastValue = node.vLast;
+                    this.ctx.lastValue = node.lastRule.vLast;
                     this.ctx.lastRuleValue = ri.vLast;
+                    this.ctx.lastRuleName = node.lastRule.r.name;
                     return this.s[name].runInContext(this.ctx);
                 }
             };
@@ -118,7 +119,7 @@ module.exports = function(RED) {
         var ri;         // Rule item
         var ru;         // Rule config
         
-        this.vLast = undefined;
+        this.lastRule = undefined;
         
         function flagActive(r) {
             if (r.a) {
@@ -212,7 +213,7 @@ module.exports = function(RED) {
             ri = {
                 i:i,                                // Index
                 r:ru,                               // Rule
-                isState:ru.matchMode=='state',          // isState
+                isState:ru.matchMode=='state',      // isState
                 a:false,                            // Active
                 ma:ru.triggerActive,                // Multiple activations
                 msg:undefined,                      // Usage message
@@ -360,7 +361,7 @@ module.exports = function(RED) {
 
                         v = this.v.e(rv, al);
                         this.vLast = v;
-                        node.vLast = v;
+                        node.lastRule = this;
 
                         delete msg.state;
                         delete msg.engineValue;
@@ -373,7 +374,7 @@ module.exports = function(RED) {
                             default:
                                 v = evalCmd(this.r, this.r, "onInactive", this.r.onInactiveType, this.r.onInactive, "onInactiveJS", this.msg, false);
                                 this.vLast = v;
-                                node.vLast = v;
+                                node.lastRule = this;
                         }
                     }
 
@@ -639,6 +640,9 @@ module.exports = function(RED) {
 
             ri.init();
             r.push(ri);
+            
+            if (!this.lastRule)
+                this.lastRule = ri;
         }
         
         this.on("input", function(msg, send, done) {
