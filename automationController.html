@@ -14,11 +14,11 @@
 
     <!-- behavior -->
     <div class="form-row">
-        <label for="node-rule-behavior" data-i18n="item.behavior"></label>
+        <label for="node-rule-behavior" data-i18n="rule.behavior"></label>
         <select style="width:70%" id="node-rule-behavior">
-            <option value="sng" data-i18n="item.behave.sng"></option>
-            <option value="mul" data-i18n="item.behave.mul"></option>
-            <option value="can" data-i18n="item.behave.can"></option>
+            <option value="sng" data-i18n="rule.behave.sng"></option>
+            <option value="mul" data-i18n="rule.behave.mul"></option>
+            <option value="can" data-i18n="rule.behave.can"></option>
         </select>
     </div>
     
@@ -37,16 +37,16 @@
     
     <!-- name -->
     <div class="form-row" style="margin-top: 10px">
-        <label for="node-rule-name" data-i18n="item.name"></label>
+        <label for="node-rule-name" data-i18n="rule.name"></label>
         <input type="text" id="node-rule-name">
     </div>
 
     <!-- match mode -->
     <div class="form-row">
-        <label for="node-rule-matchMode" data-i18n="item.match"></label>
+        <label for="node-rule-matchMode" data-i18n="rule.match"></label>
         <select style="width:70%" id="node-rule-matchMode">
-            <option value="event" data-i18n="item.matches.event"></option>
-            <option value="state" data-i18n="item.matches.state"></option>
+            <option value="event" data-i18n="rule.matches.event"></option>
+            <option value="state" data-i18n="rule.matches.state"></option>
         </select>
     </div>
     
@@ -54,12 +54,14 @@
     <div class="form-row">
         <label id="node-rule-activeLbl" for="node-rule-active" data-i18n="label.amatch"></label>
         <input type="text" id="node-rule-active" style="width:70%">
+        <input type="hidden" id="node-rule-activeJS">
     </div>
     
     <!-- inactive -->
     <div class="form-row" id="node-inactiveRow">
         <label for="node-rule-inactive" data-i18n="label.imatch"></label>
         <input type="text" id="node-rule-inactive" style="width:70%">
+        <input type="hidden" id="node-rule-inactiveJS">
     </div>
     
     <!-- cool down -->
@@ -129,10 +131,11 @@
         </select><br/>
     </div>
     
-    <!-- active -->
+    <!-- onInactive -->
     <div class="form-row" id="node-onInactive">
         <label for="node-rule-onInactive" data-i18n="label.sendInactive"></label>
         <input type="text" id="node-rule-onInactive" style="width:70%">
+        <input type="hidden" id="node-rule-onInactiveJS">
     </div>
     
     <!-- reset -->
@@ -152,12 +155,12 @@
 
     <!-- mode -->
     <div class="form-row">
-        <label for="node-rule-mode" data-i18n="item.mode"></label>
+        <label for="node-rule-mode" data-i18n="rule.mode"></label>
         <select style="width:70%" id="node-rule-mode">
-            <option value="single" data-i18n="item.modes.single"></option>
-            <option value="iterate" data-i18n="item.modes.iterate"></option>
-            <option value="bounce" data-i18n="item.modes.bounce"></option>
-            <option value="fixed" data-i18n="item.modes.fixed"></option>
+            <option value="single" data-i18n="rule.modes.single"></option>
+            <option value="iterate" data-i18n="rule.modes.iterate"></option>
+            <option value="bounce" data-i18n="rule.modes.bounce"></option>
+            <option value="fixed" data-i18n="rule.modes.fixed"></option>
         </select>
     </div>
 
@@ -167,6 +170,7 @@
             <div class="form-row">
                 <label for="node-rule-sValue" data-i18n="label.value"></label>
                 <input id="node-rule-sValue" type="text">
+                <input id="node-rule-sValueJS" type="hidden">
             </div>
         </div>
 
@@ -175,6 +179,7 @@
             <div class="form-row">
                 <label for="node-rule-iInit" data-i18n="label.init" style="width: 90px"></label>
                 <input id="node-rule-iInit" type="text">
+                <input id="node-rule-iInitJS" type="hidden">
             </div>
             <div class="form-row">
                 <label for="node-rule-iMin" data-i18n="label.min" style="width: 90px"></label>
@@ -210,6 +215,7 @@
             <div class="form-row">
                 <label for="node-rule-bInit" data-i18n="label.init" style="width: 90px"></label>
                 <input id="node-rule-bInit" type="text">
+                <input id="node-rule-bInitJS" type="hidden">
             </div>
             <div class="form-row">
                 <label for="node-rule-bIPos">&nbsp;</label>
@@ -249,6 +255,7 @@
             <div class="form-row">
                 <label for="node-rule-fInit" data-i18n="label.inix" style="width: 90px"></label>
                 <input id="node-rule-fInit" type="text">
+                <input id="node-rule-fInitJS" type="hidden">
             </div>
             
             <div class="form-row">
@@ -268,8 +275,8 @@
             </div>
         </div>
     </div>
-    
-    <!-- delete -->
+
+<!-- delete -->
     <div class="form-row">
         <label for="node-rule-delete">&nbsp;</label>
         <button id="node-rule-delete" class="red-ui-button primary" data-i18n="label.delete"></button>
@@ -313,24 +320,53 @@
         bEdge: true,
 
         fInit: '0',     fInitType: 'num',
-        fValues: [ {v:'0', t:'num'} ],
+        fValues: [ {v:'0', t:'num', js:''} ],
         fCycle: true
     };
     
     var selectedRule = 0;
-       
-    function addFixedRow(node,v,t) {
+    var opt = {};
+    
+    var buildEditor = function(id, value, defaultValue) {
+        var editor = RED.editor.createEditor({
+            id: id,
+            mode: 'ace/mode/nrjavascript',
+            value: value || defaultValue || "",
+            globals: {
+                msg:true,
+                context:true,
+                RED: true,
+                util: true,
+                flow: true,
+                global: true,
+                console: true,
+                Buffer: true,
+                setTimeout: true,
+                clearTimeout: true,
+                setInterval: true,
+                clearInterval: true
+            }
+        });
+        if (defaultValue && value === "") {
+            editor.moveCursorTo(defaultValue.split("\n").length - 1, 0);
+        }
+        return editor;
+    };
+
+    function addFixedRow(node,v,t,js) {
         var pa = $('#node-rule-fValues');
 
         var freeId = getFreeRuleId('#node-rule-fValues', 'node-rule-fField');
         if (v===undefined) {
             v = freeId;
             t = 'num';
+            js = '';
         }
 
         var e = document.createElement('div');
         var s = document.createElement('label');
         var i = document.createElement('input');
+        var ijs = document.createElement('input');
         var r = document.createElement('button');
 
         e.style.whiteSpace = "nowrap";
@@ -344,6 +380,8 @@
         i.style.width = "200px";
         i.id = 'node-rule-fValue' + freeId;
         i.type = 'text';
+        ijs.id = 'node-rule-fValue' + freeId + 'JS';
+        ijs.type = 'hidden';
         i.value = v;
         r.innerText = '-';
         r.onclick = me=>removeFixedRow(e);
@@ -351,12 +389,14 @@
         e.append(s);
         e.append(' ');
         e.append(i);
+        e.append(ijs);
         e.append(r);
         pa.append(e);
 
-        $(i).typedInput({default:'num',types:['msg','flow','global','str','num','bool','json','bin','date','jsonata','env']});
+        $(i).typedInput({default:'num',types:['msg','flow','global','str','num','bool','json','bin','date','jsonata','env',opt.js]});
         $(i).typedInput('value', v);
         $(i).typedInput('type', t);
+        $(ijs).val(js);
     }
 
     function removeFixedRow(re) {
@@ -388,7 +428,7 @@
         return (node.nrules || []).find(itm=> itm.id==id || itm.eid==id);
    }
 
-    function createTab(node, selected) {
+    function createRule(node, selected) {
         var id = getFreeRuleId('#rules', 'rules-custom');
         var rule = Object.assign({
             id: id,
@@ -404,10 +444,10 @@
         
         // Connect and add rule
         node.nrules.push(rule);
-        addTab(node, rule, selected);
+        addRuleTab(node, rule, selected);
     }
 
-    function addTab(node, rule, selected, beforeElem) {
+    function addRuleTab(node, rule, selected, beforeElem) {
         var e = document.createElement('button');
         e.id = rule.eid;
         e.className = 'red-ui-button toggle rules-group';
@@ -421,7 +461,7 @@
         e.append(lbl);
         
         $(e).on('click', function() {
-            selectTab(node, this);
+            selectRuleTab(node, this);
         });
 
         if (!!beforeElem)
@@ -432,7 +472,7 @@
         beforeElem.before(e);
 
         if (selected !== false)
-            selectTab(node,e);
+            selectRuleTab(node,e);
 
         // Hide + on max
         if (beforeElem.parent().children().length > MAX_TABS)
@@ -440,7 +480,7 @@
         $("#node-rule-delete").show();
     }
 
-    function removeTab(node, rule) {
+    function removeRuleTab(node, rule) {
         var idx = -1;
         for (var i = 0; i < node.nrules.length; i++) {
             if (rule === node.nrules[i]) {
@@ -458,7 +498,7 @@
         if (idx >= node.nrules.length) idx=node.nrules.length - 1;
         
         $('#' + rule.eid).remove();
-        selectTab(node, document.getElementById(node.nrules[idx].eid));
+        selectRuleTab(node, document.getElementById(node.nrules[idx].eid));
 
         // Remove output
         var currentOutputs = JSON.parse(node.outputCount.val()||"{}");
@@ -474,7 +514,7 @@
             $("#node-rule-delete").hide();
     }
 
-    function selectTab(node, e) {
+    function selectRuleTab(node, e) {
         $(".rules-group").removeClass("selected");
         $(e).addClass("selected");
 
@@ -562,18 +602,23 @@
         $('#node-rule-matchMode').val(rule.matchMode);
         $('#node-rule-mode').val(rule.mode);
         updateMode(rule.mode);
-
+        
         read('output', rule);
         read('active', rule);
+        $('#node-rule-activeJS').val(rule.activeJS);
         read('inactive', rule);
+        $('#node-rule-inactiveJS').val(rule.inactiveJS);
         read('triggerActive', rule, true);
         read('resetInitial', rule, true);
         read('onInactive', rule);
+        $('#node-rule-onInactiveJS').val(rule.onInactiveJS);
         read('repMsg', rule);
 
         read('sValue', rule);
+        $('#node-rule-sValueJS').val(rule.sValueJS);
         
         read('iInit', rule);
+        $('#node-rule-iInitJS').val(rule.iInitJS);
         read('iMin', rule);
         read('iMax', rule);
         read('iSteps', rule);
@@ -581,6 +626,7 @@
         read('iEdge', rule, true);
         
         read('bInit', rule);
+        $('#node-rule-bInitJS').val(rule.bInitJS);
         read('bIPos', rule, true);
         read('bMin', rule);
         read('bMax', rule);
@@ -589,10 +635,11 @@
         read('bEdge', rule, true);
         
         read('fInit', rule);
+        $('#node-rule-fInitJS').val(rule.fInitJS);
         read('fCycle', rule, true);
 
         $('#node-rule-fValues').empty();
-        (rule.fValues || []).forEach( v => addFixedRow(node, v.v, v.t) );
+        (rule.fValues || []).forEach( v => addFixedRow(node, v.v, v.t, v.js) );
 
         $('#node-rule-cool-time').val(rule.cool);
         $('#node-rule-cool-unit').val(rule.coolType);
@@ -620,15 +667,20 @@
 
         write('output', rule);
         write('active', rule);
+        rule.activeJS = rule.activeType=='js' ? $('#node-rule-activeJS').val() : '';
         write('inactive', rule);
+        rule.inactiveJS = rule.inactiveType=='js' ? $('#node-rule-inactiveJS').val() : '';
         write('triggerActive', rule, true);
         write('resetInitial', rule, true);
         write('onInactive', rule);
+        rule.onInactiveJS = rule.onInactiveType=='js' ? $('#node-rule-onInactiveJS').val() : '';
         write('repMsg', rule);
 
         write('sValue', rule);
+        rule.sValueJS = rule.sValueType=='js' ? $('#node-rule-sValueJS').val() : '';
         
         write('iInit', rule);
+        rule.iInitJS = rule.iInitType=='js' ? $('#node-rule-iInitJS').val() : '';
         write('iMin', rule);
         write('iMax', rule);
         write('iSteps', rule);
@@ -636,6 +688,7 @@
         write('iEdge', rule, true);
         
         write('bInit', rule);
+        rule.bInitJS = rule.bInitType=='js' ? $('#node-rule-bInitJS').val() : '';
         write('bIPos', rule, true);
         write('bMin', rule);
         write('bMax', rule);
@@ -644,14 +697,19 @@
         write('bEdge', rule, true);
         
         write('fInit', rule);
+        rule.fInitJS = rule.fInitType=='js' ? $('#node-rule-fInitJS').val() : '';
         write('fCycle', rule, true);
         
         rule.fValues = [];
         $('#node-rule-fValues').children().each((idx,e)=>{
-            e = $('#node-rule-fValue' + e.id.replace('node-rule-fField', ''));
+            var id = e.id.replace('node-rule-fField', '');
+            e = $('#node-rule-fValue' + id);
+            var js = $('#node-rule-fValue' + id + 'JS');
+            
             rule.fValues.push({
                 v: e.typedInput('value'),
-                t: e.typedInput('type')
+                t: e.typedInput('type'),
+                js: js.val()
             });
         });
 
@@ -719,7 +777,23 @@
         },
         oneditprepare: function() {
             var node = this;
-            
+
+            var hJSEditor = function(editor) {
+                return function(e) {
+                    if (e) e.preventDefault();
+                    var value = editor.val();
+                    RED.editor.editJavaScript({
+                        value: value,
+                        width: "Infinity",
+                        cursor: 0,
+                        mode: "ace/mode/nrjavascript",
+                        complete: function(v,cursor) {
+                            editor.val(v);
+                        }
+                    })
+                }
+            };
+
             $("#node-input-inputValue").typedInput({
                 type:"msg",
                 types:["msg","flow","global","env"],
@@ -728,32 +802,36 @@
 
             $('#node-rule-behavior').val(this.behavior);
 
-            var optionNothing = {value:"nul",label:this._("item.nothing"),hasValue:false};
-            var optionOriginal = {value:"pay",label:this._("item.original"),hasValue:false};
-            var optionLatest = {value:"payl",label:this._("item.latest"),hasValue:false};
-            var optionRule = {value:"payr",label:this._("item.latestRule"),hasValue:false};
+            opt.nothing = {value:"nul",label:this._("option.nothing"),hasValue:false};
+            opt.original = {value:"pay",label:this._("option.original"),hasValue:false};
+            opt.latest = {value:"payl",label:this._("option.latest"),hasValue:false};
+            opt.rule = {value:"payr",label:this._("option.latestRule"),hasValue:false};
+            opt.js = {value:"js",label:this._("option.js"),hasValue:false,expand:function(){
+                hJSEditor($('#'+this.bindings[0].id+'JS'))();
+            }};
             
             // Setup fields
             $("#node-rule-output").typedInput(    { default:"msg", types:['msg'] });
-            $("#node-rule-active").typedInput(    { default:"str", types:['msg','flow','global','str','num','bool','json','bin','date','jsonata','env'] });
-            $("#node-rule-inactive").typedInput(  { default:"str", types:['msg','flow','global','str','num','bool','json','bin','date','jsonata','env'] });
-            $("#node-rule-onInactive").typedInput(  { default:"str", types:['msg','flow','global','str','num','bool','json','bin','date','jsonata','env',optionNothing] });
-            $("#node-rule-repMsg").typedInput(  { default:'payl', types:['json',optionOriginal,optionRule,optionLatest] });
-            
-            $("#node-rule-sValue").typedInput({ default:"num", types:['msg','flow','global','str','num','bool','json','bin','date','jsonata','env'] });
 
-            $("#node-rule-iInit").typedInput( { default:"num", types:['num','msg','flow','global','env'] });
+            $("#node-rule-active").typedInput(    { default:"str", types:['msg','flow','global','str','num','bool','json','bin','date','jsonata','env',opt.js] });
+            $("#node-rule-inactive").typedInput(  { default:"str", types:['msg','flow','global','str','num','bool','json','bin','date','jsonata','env',opt.js] });
+            $("#node-rule-onInactive").typedInput(  { default:"str", types:['msg','flow','global','str','num','bool','json','bin','date','jsonata','env',opt.js,opt.nothing] });
+            $("#node-rule-repMsg").typedInput(  { default:'payl', types:['json',opt.original,opt.rule,opt.latest] });
+            
+            $("#node-rule-sValue").typedInput({ default:"num", types:['msg','flow','global','str','num','bool','json','bin','date','jsonata','env', opt.js] });
+
+            $("#node-rule-iInit").typedInput( { default:"num", types:['num','msg','flow','global','env', opt.js] });
             $("#node-rule-iMin").typedInput(  { default:"num", types:['num','msg','flow','global','env'] });
             $("#node-rule-iMax").typedInput(  { default:"num", types:['num','msg','flow','global','env'] });
             $("#node-rule-iSteps").typedInput({ default:"num", types:['num','msg','flow','global','env'] });
             
-            $("#node-rule-bInit").typedInput( { default:"num", types:['num','msg','flow','global','env'] });
+            $("#node-rule-bInit").typedInput( { default:"num", types:['num','msg','flow','global','env', opt.js] });
             $("#node-rule-bMin").typedInput(  { default:"num", types:['num','msg','flow','global','env'] });
             $("#node-rule-bMax").typedInput(  { default:"num", types:['num','msg','flow','global','env'] });
             $("#node-rule-bUp").typedInput(   { default:"num", types:['num','msg','flow','global','env'] });
             $("#node-rule-bDown").typedInput( { default:"num", types:['num','msg','flow','global','env'] });
             
-            $("#node-rule-fInit").typedInput( { default:"num", types:['num','msg','flow','global','env'] });
+            $("#node-rule-fInit").typedInput( { default:"num", types:['num','msg','flow','global','env', opt.js] });
             
 
             // Connect listeners
@@ -763,7 +841,7 @@
 
             $('#node-rule-mode').on('change', updateMode);
             $("#node-rule-fadd").on('click', ()=>addFixedRow(node));
-            $("#node-rule-delete").on('click', ()=>removeTab(node, selectedRule));
+            $("#node-rule-delete").on('click', ()=>removeRuleTab(node, selectedRule));
             
             // Prepare new rules (will be applied to "rules" when saving)
             node.nrules = Object.assign(!!node.rules ? node.rules.slice() : []);
@@ -774,16 +852,16 @@
 
             // Add tabs
             for (var i = 0; i < node.nrules.length; i++)
-                addTab(node, node.nrules[i], i==0);
+                addRuleTab(node, node.nrules[i], i==0);
             
             updateOutputs(node, true);
             $("#node-input-seperated").on("click", () => updateOutputs(node, false));
 
             if (node.nrules.length == 0)
-                createTab(node, true);
+                createRule(node, true);
 
             // Connect create new tab
-            $("#rules-create").on("click", () => createTab(node) );
+            $("#rules-create").on("click", () => createRule(node) );
             updateMatchMode(node);
         },
         oneditsave: function() {

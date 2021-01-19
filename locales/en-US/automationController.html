@@ -84,10 +84,12 @@
     <dl class="message-properties">
       <dt>Activate on<span class="property-type">*</span></dt>
       <dd>The value to match the <code>input</code> field against to begin execute the rule.
+        <br><i><b>JS accepted:</b> This field is designed to handle JavaScript (see JavaScript secion for more info). It will accept the return value to match against the input or, it can return a true/false statement to tell if matched the field.</i>
       </dd>
     
       <dt>Deactivate on<span class="property-type">*</span></dt>
       <dd>The value to match the <code>input</code> field against to halt/stop the execution of this rule.
+        <br><i><b>JS accepted:</b> This field is designed to handle JavaScript (see JavaScript secion for more info). It will accept the return value to match against the input or, it can return a true/false statement to tell if matched the field.</i>
       </dd>
     
       <dt>Time out<span class="property-type">milliseconds | seconds | minutes | hours | days</span></dt>
@@ -115,6 +117,7 @@
     
       <dt>Send on inactive<span class="property-type">*</span></dt>
       <dd>The message to send when the state becomes inactive either through <code>Deactive on</code> or the <code>Time out</code>.
+        <br><i><b>JS accepted:</b> This field is designed to handle JavaScript (see JavaScript secion for more info). It can return free of choice.</i>
       </dd>
       
       <dt>Reset to initial value...</dt>
@@ -140,6 +143,7 @@
     <dl class="message-properties">
       <dt>Value<span class="property-type">*</span></dt>
       <dd>The value to send out to the <code>output</code> field.
+      <br><i><b>JS accepted:</b> This field is designed to handle JavaScript (see JavaScript secion for more info). It can return free of choice.</i>
       </dd>
     </dl>
     
@@ -147,7 +151,8 @@
     <dl class="message-properties">
       <dt>Initial value<span class="property-type">number | msg.[] | flow.[] | global.[] | env. var</span></dt>
       <dd>The initial value to use for first execution or when being reset <i>(either by <code>Reset to initial..</code> or by message input, <code>msg.state='reset'</code>)</i>.
-        <i>This value must resolve into an integer number.</i>
+        <br><i>This value must resolve into an integer number.</i>
+        <br><i><b>JS accepted:</b> This field is designed to handle JavaScript (see JavaScript secion for more info). It must return a valid integer, or 0 will be used.</i>
       </dd>
     
       <dt>Min<span class="property-type">number | msg.[] | flow.[] | global.[] | env. var</span></dt>
@@ -177,7 +182,8 @@
     <dl class="message-properties">
       <dt>Initial value<span class="property-type">number | msg.[] | flow.[] | global.[] | env. var</span></dt>
       <dd>The initial value to use for first execution or when being reset <i>(either by <code>Reset to initial..</code> or by message input, <code>msg.state='reset'</code>)</i>.
-        <i>This value must resolve into an integer number.</i>
+        <br><i>This value must resolve into an integer number.</i>
+        <br><i><b>JS accepted:</b> This field is designed to handle JavaScript (see JavaScript secion for more info). It must return a valid integer, or 0 will be used.</i>
       </dd>
     
       <dt>Min<span class="property-type">number | msg.[] | flow.[] | global.[] | env. var</span></dt>
@@ -207,11 +213,13 @@
     <dl class="message-properties">
       <dt>Initial index<span class="property-type">number | msg.[] | flow.[] | global.[] | env. var</span></dt>
       <dd>The initial index to use for first execution or when being reset <i>(either by <code>Reset to initial..</code> or by message input, <code>msg.state='reset'</code>)</i>.
-        This value must resolve into a positive integer number matching one of the items <i>(First record starts on zero)</i>
+        <br>This value must resolve into a positive integer number matching one of the items <i>(First record starts on zero)</i>
+        <br><i><b>JS accepted:</b> This field is designed to handle JavaScript (see JavaScript secion for more info). It must return a valid integer, or 0 will be used.</i>
       </dd>
     
       <dt>Index #<span class="property-type">*</span></dt>
       <dd>The value to send when current index maches this row.
+      <br><i><b>JS accepted:</b> This field is designed to handle JavaScript (see JavaScript secion for more info). It can return free of choice.</i>
       </dd>
       
       <dt>- button</dt>
@@ -235,7 +243,22 @@
   <p>The <code>msg.state</code> can be used to reset the state of the current <code>output engine</code>.<br>
     The <code>msg.engineValue</code> can be used to override the current value <i>(before execution, this means that the value will be altered)</i>.
   </p>
-  
+
+  <h3>JavaScript</h3>
+  <p>Some fields has been JavaScript enabled. The engine works the same way in all different functions.
+  It contains the following access features:
+  <ul>
+   <li><b>lastValue</b>: Contains the latest executed value from all the rules.
+   <li><b>lastRuleValue</b>: Contains the latest executed value from the current rule.
+   <li><b>msg</b>: The active message object.
+   <li><b>console</b>: The console to debug with.
+   <li><b>context</b>: Contains the <i>get. set, keys, global, flow</i> function.
+   <li><b>flow</b>: Contains the <i>get. set, keys</i> function.
+   <li><b>global</b>: Contains the <i>get. set, keys</i> function.
+   <li><b>env</b>: Contains the <i>get</i> function.
+  </ul>
+  </p>
+
   <h3>References</h3>
   <ul>
     <li><a href="https://github.com/TLacke/node-red-contrib-automation-controller">GitHub</a> - GitHub repository</li>

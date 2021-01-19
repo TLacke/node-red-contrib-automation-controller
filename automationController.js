@@ -1,5 +1,6 @@
 module.exports = function(RED) {
     "use strict";
+    var vm = require("vm");
 
     function getTime(v, t) {
         if (t === "ms") return v;
@@ -7,6 +8,98 @@ module.exports = function(RED) {
         else if (t === "h")   return v * (60 * 60 * 1000);
         else if (t === "d")    return v * (24 * 60 * 60 * 1000);
         else return v * 1000;
+    }
+
+    // Creates a new script object
+    function createScript(node, type, code) {
+        var opt = {
+            filename: 'Function automationController.'+type+':'+node.id+(node.name?' ['+node.name+']':''), // filename for stack traces
+            displayErrors: true
+        };
+        var sc = "(function(msg) {"+code +"})(msg)";
+        return vm.createScript(sc, opt);
+    }
+
+    // Initiates the script object.
+    function runScript(node, ri, s, type, fName, msg) {
+        // Setup the script object functionality for the node.
+        if (!node.script) {
+            node.script = {
+                sandbox: {
+                    console:console,
+                    Buffer:Buffer,
+                    Date: Date,
+                    __node__: {
+                        id: node.id,
+                        name: node.name
+                    },
+                    context: {
+                        set: function() {
+                            node.context().set.apply(node,arguments);
+                        },
+                        get: function() {
+                            return node.context().get.apply(node,arguments);
+                        },
+                        keys: function() {
+                            return node.context().keys.apply(node,arguments);
+                        },
+                        get global() {
+                            return node.context().global;
+                        },
+                        get flow() {
+                            return node.context().flow;
+                        }
+                    },
+                    flow: {
+                        set: function() {
+                            node.context().flow.set.apply(node,arguments);
+                        },
+                        get: function() {
+                            return node.context().flow.get.apply(node,arguments);
+                        },
+                        keys: function() {
+                            return node.context().flow.keys.apply(node,arguments);
+                        }
+                    },
+                    global: {
+                        set: function() {
+                            node.context().global.set.apply(node,arguments);
+                        },
+                        get: function() {
+                            return node.context().global.get.apply(node,arguments);
+                        },
+                        keys: function() {
+                            return node.context().global.keys.apply(node,arguments);
+                        }
+                    },
+                    env: {
+                        get: function(envVar) {
+                            var flow = node._flow;
+                            return flow.getSetting(envVar);
+                        }
+                    }
+                }
+            };
+        }
+        
+        if (!ri.script) {
+            ri.script = {
+                ctx: vm.createContext(node.script.sandbox),
+                s:{},
+                run: function(name, msg) {
+                    this.ctx.msg = msg;
+                    this.ctx.lastValue = node.vLast;
+                    this.ctx.lastRuleValue = ri.vLast;
+                    return this.s[name].runInContext(this.ctx);
+                }
+            };
+        }
+
+        if (!ri.script.s[fName]) {
+            ri.script.s[fName] = createScript(node, type, s[fName]);
+        }
+        
+        return ri.script.run(fName, msg);
     }
 
     function AutomationControllerNode(config) {
@@ -21,9 +114,12 @@ module.exports = function(RED) {
         var so = config.seperated;  // Seperated outputs
         var lm;                     // Latest message
         var act = [];
-        var r = [];
-        var ri,ru;
-
+        var r = [];     // Rules
+        var ri;         // Rule item
+        var ru;         // Rule config
+        
+        this.vLast = undefined;
+        
         function flagActive(r) {
             if (r.a) {
                 if (act.indexOf(r)==-1)
@@ -76,8 +172,37 @@ module.exports = function(RED) {
             return rule.msg;
         }
         
-        function updateStatus(r) {
-            node.status({fill:r.a?'green':'red',shape:"dot",text:r.r.name + ': ' + (r.a?"active":"inactive")});
+        function updateStatus(r,custom) {
+            node.status({fill:r.a?'green':'red',shape:"dot",text:r.r.name + ': ' + RED._("status."+custom)});
+        }
+
+        // Rule, ScriptStorage, Type, ValueType, Value, JSFieldName, message, isInt
+        function evalCmd(r, s, type, vt, v, js, msg, fInt) {
+            switch (vt) {
+             case 'js':
+                r = runScript(node, r, s, type, js, msg);
+                break;
+
+             default:
+                r = RED.util.evaluateNodeProperty(v, vt, node, msg);
+                break;
+            }
+            
+            if (fInt===true)
+                r = Number.parseInt(r, 10);
+            
+            return r;
+        }
+
+        // Input, Rule, ScriptStorage, Type, ValueType, Value, JSFieldName, message, isInt
+        function matchCmd(inp, r, s, type, vt, v, js, msg, fInt) {
+            v = evalCmd(r,s,type,vt,v,js,msg,fInt);
+            
+            // If javascript, then accept true/false
+            if (vt=='js' && (v==true || v==false))
+                return v;
+            
+            return inp==v;
         }
         
         // Setup rules
@@ -87,7 +212,7 @@ module.exports = function(RED) {
             ri = {
                 i:i,                                // Index
                 r:ru,                               // Rule
-                ist:ru.matchMode=='state',          // isState
+                isState:ru.matchMode=='state',          // isState
                 a:false,                            // Active
                 ma:ru.triggerActive,                // Multiple activations
                 msg:undefined,                      // Usage message
@@ -97,31 +222,32 @@ module.exports = function(RED) {
                 co:getTime(ru.cool, ru.coolType),   // Cooldown
                 rs:getTime(ru.resEvent, ru.resEventType), // reset event
                 ht:undefined,                       // Timeout handler
+                vLast:undefined,
                 t:function(inp,msg,send,res) {      // Test
                     var v,t;
                     
-                    var a = (inp == RED.util.evaluateNodeProperty(this.r.active,this.r.activeType,node,msg));
+                    var act = matchCmd(inp, this.r, this.r, "active", this.r.activeType, this.r.active, "activeJS", msg, false);
                     
-                    if (a) {
+                    if (act) {
                         updateMsg(this, msg, false);
                     }
 
                     // If not active or multi activations
-                    if (a && (!this.a || this.ma)) {
+                    if (act && (!this.a || this.ma)) {
                         return this.e(msg, T_ACTIVE, send, res);
                     }
                     
-                    if (this.a && this.ist) {
-                        if (inp == RED.util.evaluateNodeProperty(this.r.inactive,this.r.inactiveType,node,msg)) {
+                    if (this.a && this.isState) {
+                        if (matchCmd(inp, this.r, this.r, "inactive", this.r.inactiveType, this.r.inactive, "inactiveJS", msg, false)) {
                             return this.e(msg, T_INACTIVE, send, res);
                         }
                     }
                 },
-                e:function(msg,a,send,res) {        // Execute
-                    var st = (a==T_ACTIVE || a==T_REPEAT);  // New state
+                e:function(msg,event,send,res) {        // Execute
+                    var state = (event==T_ACTIVE || event==T_REPEAT);  // New state
 
                     // If activating/active, then
-                    if (st) {
+                    if (state) {
                         // Check behavior
                         switch (config.behavior) {
                         case 'sng':     // Accept single
@@ -136,15 +262,15 @@ module.exports = function(RED) {
 
                         case 'can':     // Cancel others
                             // Loop though active and cancel all
-                            if (st)
+                            if (state)
                                 act.forEach(r=>{
                                     if (r!=this) r.c(send);
                                 });
                             break;
                         }
                     }
-                    var c = this.a != st;                   // Changed
-                    this.a = st;                            // Set state
+                    var c = this.a != state;               // Changed
+                    this.a = state;                        // Set state
 
                     // If inactive and not changed, then abort
                     if (!this.a && !c) {
@@ -155,7 +281,7 @@ module.exports = function(RED) {
                     msg = updateMsg(this, msg, c);
                     
                     // If state
-                    if (this.ist) {
+                    if (this.isState) {
                         // If state changed, then
                         if (c) {
                             // If active, then add timers
@@ -175,7 +301,7 @@ module.exports = function(RED) {
                             }
                         } else {
                             // If not changed but active, then restart timers
-                            if (a==T_ACTIVE && this.ma) {
+                            if (event==T_ACTIVE && this.ma) {
                                 clearInterval(this.hr);
                                 clearTimeout(this.ht);
                                 this.hr = setInterval(()=>{
@@ -210,7 +336,8 @@ module.exports = function(RED) {
                             // If has reset event, then
                             if (this.rs > 0) {
                                 this.hr = setTimeout(()=>{
-                                    this.v.e(true, false);
+                                    this.v.c = undefined;
+                                    updateStatus(this, "reset");
                                 }, this.rs);
                             }
                         }
@@ -221,32 +348,36 @@ module.exports = function(RED) {
                     var v;
                     
                     if (this.a) {
-                        var rv = a==T_ACTIVE && this.ist && this.r.resetInitial;
+                        var rv = event==T_ACTIVE && this.isState && this.r.resetInitial;
                         if (!rv && msg!==undefined && msg.state=='reset') rv = true;
 
                         // Check if is custom engine value
-                        var al = true;
-                        if (msg!==undefined && !isNaN(parseInt(msg.engineValue))) {
+                        var al = !rv;
+                        if (msg!==undefined && !isNaN(Number.parseInt(msg.engineValue))) {
                             this.v.c = Number.parseInt(msg.engineValue);
                             al = false;
                         }
 
                         v = this.v.e(rv, al);
+                        this.vLast = v;
+                        node.vLast = v;
 
                         delete msg.state;
                         delete msg.engineValue;
                         
-                    } else if (this.ist) {
+                    } else if (this.isState) {
                         switch (this.r.onInactiveType) {
                             case 'nul':
                                 v = undefined;
                                 break;
                             default:
-                                v = RED.util.evaluateNodeProperty(this.r.onInactive, this.r.onInactiveType, node, this.msg);
+                                v = evalCmd(this.r, this.r, "onInactive", this.r.onInactiveType, this.r.onInactive, "onInactiveJS", this.msg, false);
+                                this.vLast = v;
+                                node.vLast = v;
                         }
                     }
 
-                    if (!this.ist && this.a && this.co == 0) {
+                    if (!this.isState && this.a && this.co == 0) {
                         this.a = false;
                         this.msg = undefined;
                     }
@@ -270,14 +401,14 @@ module.exports = function(RED) {
                     }
 
                     // Show status icon.
-                    updateStatus(this);
+                    updateStatus(this, this.a?"active":"inactive");
                     
                     // If is a time out/cooldown, then check if all done
-                    if (a==T_TIMEOUT)
+                    if (event==T_TIMEOUT)
                         checkDone();
                     
                 },
-                c:function(send) {
+                c:function(send) {  // Cancel
                     // If not active, then skip cancel
                     if (!this.a)
                         return;
@@ -294,7 +425,7 @@ module.exports = function(RED) {
                             this.v = {
                                 r:r,            // Rule
                                 e:function(rv) {
-                                    return RED.util.evaluateNodeProperty(this.r.r.sValue, this.r.r.sValueType, node, this.r.msg);
+                                    return evalCmd(this.r, this.r.r, "value", this.r.r.sValueType, this.r.r.sValue, "sValueJS", this.r.msg, false);
                                 }
                             };
                             break;
@@ -302,7 +433,7 @@ module.exports = function(RED) {
                             this.v = {
                                 r:r,            // Rule
                                 i:function() {  // Initial value
-                                    return Number.parseInt(RED.util.evaluateNodeProperty(this.r.r.iInit, this.r.r.iInitType, node, this.r.msg), 10);
+                                    return evalCmd(this.r, this.r.r, "init", this.r.r.iInitType, this.r.r.iInit, "iInitJS", this.r.msg, true);
                                 },
                                 c:undefined,    // Current
                                 mi:undefined,   // Min
@@ -381,7 +512,7 @@ module.exports = function(RED) {
                             this.v = {
                                 r:r,            // Rule
                                 i:function() {  // Initial value
-                                    return Number.parseInt(RED.util.evaluateNodeProperty(this.r.r.bInit, this.r.r.bInitType, node, this.r.msg));
+                                    return evalCmd(this.r, this.r.r, "init", this.r.r.bInitType, this.r.r.bInit, "bInitJS", this.r.msg, true);
                                 },
                                 c:undefined,    // Current
                                 p:r.bIPos,      // Positive mode
@@ -458,11 +589,11 @@ module.exports = function(RED) {
                             this.v = {
                                 r:r,            // Rule
                                 i:function() {  // Initial value
-                                    return Number.parseInt(RED.util.evaluateNodeProperty(this.r.r.fInit, this.r.r.fInitType, node, this.r.msg), 10);
+                                    return evalCmd(this.r, this.r.r, "init", this.r.r.fInitType, this.r.r.fInit, "fInitJS", this.r.msg, true);
                                 },
                                 c:undefined,    // Current value
                                 v:r.r.fValues,  // values array
-                                e:function(rv, al) {
+                                e:function(rv, al) {        // Reset value, 
                                     // If no current or to reset value, then
                                     var r = this.c==undefined || rv;
                                     if (r) {
@@ -493,7 +624,7 @@ module.exports = function(RED) {
                                     }
 
                                     var v = this.v[this.c];
-                                    return RED.util.evaluateNodeProperty(v.v, v.t, node, this.r.msg);
+                                    return evalCmd(v, v, "value", v.t, v.v, "js", this.r.msg, false);
                                 }
                             };
                             break;
@@ -516,9 +647,11 @@ module.exports = function(RED) {
             lm = msg;
             var inp = RED.util.evaluateNodeProperty(config.inputValue, config.inputType, node, msg);
             
-            if (so) {
+            if (so) { // Seperate output
                 var res = [];
                 r.forEach(e=> e.t(inp,msg,send,res) );
+
+                // Check if has any values to send.
                 if (res.findIndex(re=>re!=undefined) != -1)
                     send(res);
                 

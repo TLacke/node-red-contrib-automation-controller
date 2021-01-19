@@ -32,8 +32,14 @@
         "triggerActive": "Trigger action on active match while active",
         "repMsg": "Message on repeat:"
     },
-    "item": {
+    "rule": {
         "name": "Rule name:",
+        "behavior": "Behavior:",
+        "behave": {
+            "sng": "Allow only single action",
+            "mul": "Allow all actions",
+            "can": "Cancel ongoing actions"
+        },
         "mode": "Output engine:",
         "modes": {
             "single": "Single value",
@@ -45,21 +51,14 @@
         "matches": {
             "event": "Event",
             "state": "State"
-        },
-        "behavior": "Behavior:",
-        "behave": {
-            "sng": "Allow only single action",
-            "mul": "Allow all actions",
-            "can": "Cancel ongoing actions"
-        },
-        "dup_match": "Dupplicated match against rule '%1'",
-
-        "else": "otherwise",
+        }
+    },
+    "option":{
         "nothing": "nothing",
         "original": "original message",
         "latest": "latest message",
         "latestRule": "latest rule message",
-        "custom": "Custom message"
+        "js": "JavaScript"
     },
     "tabs": {
         "default": "default",
@@ -91,13 +90,6 @@
         "name": "name",
         "unknown": "no director link"
     },
-    "status": {
-        "active":"active",
-        "inactive":"inactive",
-        "locked":"locked",
-        "unlocked":"unlocked",
-        "na":"untouched"
-    },
     "error": {
         "invalidMsg": "Invalid message.",
         "invalidIdx": "Invalid index",
@@ -105,5 +97,10 @@
         "stepVal": "Invalid step value",
         "minVal": "Invalid min value",
         "maxVal": "Invalid max value"
+    },
+    "status":{
+        "active":"active",
+        "inactive":"inactive",
+        "reset":"reset"
     }
 }

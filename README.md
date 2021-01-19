@@ -83,9 +83,11 @@ The time to wait before the rule's current value is reset to the initial.
 
 #### Activate on
 The value to match the **input** field against to begin execute the rule.
+_**JS accepted:** This field is designed to handle JavaScript (see JavaScript secion for more info). It will accept the return value to match against the input or, it can return a true/false statement to tell if matched the field._
 
 #### Deactivate on
 The value to match the **input** field against to halt/stop the execution of this rule.
+_**JS accepted:** This field is designed to handle JavaScript (see JavaScript secion for more info). It will accept the return value to match against the input or, it can return a true/false statement to tell if matched the field._
 
 #### Time out
 The time to wait before this action can be executed again. *(This will also prevent other rules to be executed if **behavior** is preventing multiple rules.)*
@@ -106,6 +108,7 @@ The time to wait before this action can be executed again. *(This will also prev
 
 #### Send on inactive
 The message to send when the state becomes inactive either through **Deactive on** or the **Time out**.
+_**JS accepted:** This field is designed to handle JavaScript (see JavaScript secion for more info). It can return free of choice._
 
 #### Reset to initial value...
 If **checked**, the output mode's current value will be set to its **Initial value**. *(The result depends on the **Output mode** that is used.)*.
@@ -124,11 +127,13 @@ Tells how the output should react and work:
 ### Engine: Single value
 #### Value
 The value to send out to the **output** field.
+_**JS accepted:** This field is designed to handle JavaScript (see JavaScript secion for more info). It can return free of choice._
 
 ### Engine: Iterate value
 #### Initial value
 The initial value to use for first execution or when being reset *(either by **Reset to initial..** or by message input, **msg.state='reset'**)*.
 *This value must resolve into an integer number.*
+_**JS accepted:** This field is designed to handle JavaScript (see JavaScript secion for more info). It must return a valid integer, or 0 will be used._
 
 #### Min
 The minimum value to use when cycling through the value. *(Must resolve into an integer value less than **max** value)*
@@ -151,6 +156,7 @@ And if cycle is checked, the min value will be set *(instead of "curValue - (max
 #### Initial value
 The initial value to use for first execution or when being reset *(either by **Reset to initial..** or by message input, **msg.state='reset'**)*.
 *This value must resolve into an integer number.*
+_**JS accepted:** This field is designed to handle JavaScript (see JavaScript secion for more info). It must return a valid integer, or 0 will be used._
 
 #### Min
 The minimum value to use. *(Must resolve into an integer value less than **max** value)*
@@ -173,9 +179,11 @@ If checked, the value will ensure that the max value is sent if the value reache
 #### Initial index
 The initial index to use for first execution or when being reset *(either by **Reset to initial..** or by message input, **msg.state='reset'**)*.
 This value must resolve into a positive integer number matching one of the items *(First record starts on zero)*
+_**JS accepted:** This field is designed to handle JavaScript (see JavaScript secion for more info). It must return a valid integer, or 0 will be used._
 
 #### Index #
 The value to send when current index maches this row.
+_**JS accepted:** This field is designed to handle JavaScript (see JavaScript secion for more info). It can return free of choice._
 
 #### - button
 Removes the record of the related row clicked.
@@ -187,10 +195,21 @@ Adds a new record to the fixed values.
 If checked, the index will move to the first record when cycled through. Otherwise it will prevent the execution.
 
 
-### Special inputs  
+### Special inputs
 The **msg.state** can be used to reset the state of the current **output engine**.
 The **msg.engineValue** can be used to override the current value *(before execution, this means that the value will be altered)*.
 
+### JavaScript
+Some fields has been JavaScript enabled. The engine works the same way in all different functions.
+It contains the following access features:
+ * **lastValue**: Contains the latest executed value from all the rules.
+ * **lastRuleValue**: Contains the latest executed value from the current rule.
+ * **msg**: The active message object.
+ * **console**: The console to debug with.
+ * **context**: Contains the _get. set, keys, global, flow_ function.
+ * **flow**: Contains the _get. set, keys_ function.
+ * **global**: Contains the _get. set, keys_ function.
+ * **env**: Contains the _get_ function.
 
 <a name="examples"></a>
 ## Examples
