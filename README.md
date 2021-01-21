@@ -124,10 +124,12 @@ Tells how the output should react and work:
  * **Bouncing value**, Bouncing from low to high integer values.
  * **Fixed values**, Uses a predefined list
 
+
 ### Engine: Single value
 #### Value
 The value to send out to the **output** field.
 _**JS accepted:** This field is designed to handle JavaScript (see JavaScript secion for more info). It can return free of choice._
+
 
 ### Engine: Iterate value
 #### Initial value
@@ -152,6 +154,7 @@ If checked, the value will cycle to min value when reached the max. Otherwise, t
 If checked, the value will ensure that the max value is sent if the value reached beyond the max value *(if steps is greater than 1 it might end up in max+X)*.
 And if cycle is checked, the min value will be set *(instead of "curValue - (max-min)")*.
 
+
 ### Engine: Bouncing value
 #### Initial value
 The initial value to use for first execution or when being reset *(either by **Reset to initial..** or by message input, **msg.state='reset'**)*.
@@ -175,6 +178,7 @@ The number of jumps to subtract from the current value for each iteration/execut
 #### Ensure edges reached
 If checked, the value will ensure that the max value is sent if the value reached beyond the max value *(if steps is greater than 1 it might end up in **max**+(X-1) or **min**-(X-1) and will be converted to just **min**/**max**.)*.
 
+
 ### Engine: Fixed values
 #### Initial index
 The initial index to use for first execution or when being reset *(either by **Reset to initial..** or by message input, **msg.state='reset'**)*.
@@ -194,6 +198,14 @@ Adds a new record to the fixed values.
 #### Cycle
 If checked, the index will move to the first record when cycled through. Otherwise it will prevent the execution.
 
+### Engine: Linked rule
+#### Link to rule
+The rule to execute instead when this rule is executed.
+
+#### Mirror effect
+If checked, the engine that is executed will work in reverse. _(This is convenient if to have two inputs that toggles raise/lower.)_
+Otherwise, the rule will just be executed in normal mode.
+
 
 ### Special inputs
 The **msg.state** can be used to reset the state of the current **output engine**.
@@ -211,6 +223,14 @@ It contains the following access features:
  * **flow**: Contains the _get. set, keys_ function.
  * **global**: Contains the _get. set, keys_ function.
  * **env**: Contains the _get_ function.
+ * **rules**: Contains the _index(index|name), name(index|name), value(index|name), isActive(index|name), length()_ functions.
+
+#### rules object:
+ * **index(rule.index | rule.name)**: will get the index of the specified rule.
+ * **name(rule.index | rule.name)**: will get the name of the specified rule.
+ * **value(rule.index | rule.name)**: will get the latest returned value.
+ * **isActive(rule.index | rule.name)**: will tell if the specified rule is currently active or not.
+ * **length()**: Will get the number of rules that exists in this node.
 
 <a name="examples"></a>
 ## Examples

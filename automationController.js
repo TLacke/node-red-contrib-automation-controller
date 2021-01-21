@@ -10,6 +10,12 @@ module.exports = function(RED) {
         else return v * 1000;
     }
 
+    function getRule(node, rule) {
+        if (Number.isInteger(rule))
+            return node.rules[rule];
+        return node.rules.find(r=>rule==r.r.name);
+    }
+
     // Creates a new script object
     function createScript(node, type, code) {
         var opt = {
@@ -21,7 +27,7 @@ module.exports = function(RED) {
     }
 
     // Initiates the script object.
-    function runScript(node, ri, s, type, fName, msg) {
+    function runScript(node, ri, s, type, fName, msg, inp) {
         // Setup the script object functionality for the node.
         if (!node.script) {
             node.script = {
@@ -77,6 +83,23 @@ module.exports = function(RED) {
                             var flow = node._flow;
                             return flow.getSetting(envVar);
                         }
+                    },
+                    rules: {
+                        index: function(rule) {
+                            return getRule(node, rule).i;
+                        },
+                        name: function(rule) {
+                            return getRule(node, rule).r.name;
+                        },
+                        value: function(rule) {
+                            return getRule(node, rule).vLast;
+                        },
+                        isActive: function(rule) {
+                            return getRule(node, rule).a;
+                        },
+                        length: function() {
+                            return node.rules.length;
+                        }
                     }
                 }
             };
@@ -86,11 +109,12 @@ module.exports = function(RED) {
             ri.script = {
                 ctx: vm.createContext(node.script.sandbox),
                 s:{},
-                run: function(name, msg) {
+                run: function(name, msg, inp) {
                     this.ctx.msg = msg;
                     this.ctx.lastValue = node.lastRule.vLast;
                     this.ctx.lastRuleValue = ri.vLast;
                     this.ctx.lastRuleName = node.lastRule.r.name;
+                    if (inp !== undefined) this.ctx.input = inp;
                     return this.s[name].runInContext(this.ctx);
                 }
             };
@@ -100,7 +124,7 @@ module.exports = function(RED) {
             ri.script.s[fName] = createScript(node, type, s[fName]);
         }
         
-        return ri.script.run(fName, msg);
+        return ri.script.run(fName, msg, inp);
     }
 
     function AutomationControllerNode(config) {
@@ -178,10 +202,10 @@ module.exports = function(RED) {
         }
 
         // Rule, ScriptStorage, Type, ValueType, Value, JSFieldName, message, isInt
-        function evalCmd(r, s, type, vt, v, js, msg, fInt) {
+        function evalCmd(r, s, type, vt, v, js, msg, fInt, inp) {
             switch (vt) {
              case 'js':
-                r = runScript(node, r, s, type, js, msg);
+                r = runScript(node, r, s, type, js, msg, inp);
                 break;
 
              default:
@@ -197,7 +221,7 @@ module.exports = function(RED) {
 
         // Input, Rule, ScriptStorage, Type, ValueType, Value, JSFieldName, message, isInt
         function matchCmd(inp, r, s, type, vt, v, js, msg, fInt) {
-            v = evalCmd(r,s,type,vt,v,js,msg,fInt);
+            v = evalCmd(r,s,type,vt,v,js,msg,fInt,inp);
             
             // If javascript, then accept true/false
             if (vt=='js' && (v==true || v==false))
@@ -420,11 +444,11 @@ module.exports = function(RED) {
                     clearTimeout(this.ht);
                 },
                 init:function() {
-                    var r = this;
+                    var rule = this;
                     switch (this.r.mode) {
                         case 'single':
                             this.v = {
-                                r:r,            // Rule
+                                r:rule,            // Rule
                                 e:function(rv) {
                                     return evalCmd(this.r, this.r.r, "value", this.r.r.sValueType, this.r.r.sValue, "sValueJS", this.r.msg, false);
                                 }
@@ -432,7 +456,7 @@ module.exports = function(RED) {
                             break;
                         case 'iterate':
                             this.v = {
-                                r:r,            // Rule
+                                r:rule,         // Rule
                                 i:function() {  // Initial value
                                     return evalCmd(this.r, this.r.r, "init", this.r.r.iInitType, this.r.r.iInit, "iInitJS", this.r.msg, true);
                                 },
@@ -440,7 +464,7 @@ module.exports = function(RED) {
                                 mi:undefined,   // Min
                                 ma:undefined,   // Max
                                 s: undefined,   // Steps
-                                e:function(rv, al) {
+                                e:function(rv,al,neg) {
                                     // If no current or to reset value, then
                                     var r = this.c==undefined || rv;
 
@@ -470,19 +494,29 @@ module.exports = function(RED) {
                                         if (!chkNum(this.ma, "maxVal", "Invalid max value for rule ", this.r))
                                             return;
                                         
+                                        var p;
                                         if (al) {
-                                            this.c+=this.s;
+                                            p=this.c;
+                                            if (neg!==true)
+                                                this.c+=this.s;
+                                            else
+                                                this.c-=this.s;
                                         }
 
-                                        if (this.c>this.ma) {
+                                        // -1 < min, 1 > max
+                                        var ch=this.c<this.mi?-1:this.c>this.ma?1:0;
+
+                                        if (ch!=0) {
                                             // If move to edge, then
                                             if (this.r.r.iEdge) {
-                                                if (this.c-this.s < this.ma) {
+                                                if (ch==1 && p < this.ma) {
                                                     this.c = this.ma;
+                                                } else if (ch==-1 && p > this.mi) {
+                                                    this.c = this.mi;
                                                 } else {
                                                     // If to cycle the value, then
                                                     if (this.r.r.iCycle) {
-                                                        this.c = this.mi;
+                                                        this.c = ch==1?this.mi:this.ma; // If is max then, min otherwise max
                                                     } else {
                                                         // Otherwise, complete
                                                         return undefined;
@@ -491,10 +525,18 @@ module.exports = function(RED) {
                                             } else {
                                                 // If to cycle the value, then
                                                 if (this.r.r.iCycle) {
-                                                    var ml = 10;
-                                                    while (this.c>this.ma && ml>0) {
-                                                        this.c-= (this.ma - this.mi);
-                                                        ml--;
+                                                    var ml = 10;    // Test times
+                                                    var size = this.ma-this.mi;
+                                                    if (ch==1) {
+                                                        while (this.c>this.ma && ml>0) {
+                                                            this.c-= size;
+                                                            ml--;
+                                                        }
+                                                    } else {
+                                                        while (this.c<this.mi && ml>0) {
+                                                            this.c+= size;
+                                                            ml--;
+                                                        }
                                                     }
                                                 } else {
                                                     // Otherwise, complete
@@ -511,16 +553,18 @@ module.exports = function(RED) {
                             break;
                         case 'bounce':
                             this.v = {
-                                r:r,            // Rule
+                                r:rule,         // Rule
                                 i:function() {  // Initial value
                                     return evalCmd(this.r, this.r.r, "init", this.r.r.bInitType, this.r.r.bInit, "bInitJS", this.r.msg, true);
                                 },
                                 c:undefined,    // Current
-                                p:r.bIPos,      // Positive mode
+                                p:rule.r.bIPos, // Positive mode
                                 mi:undefined,   // Min
                                 ma:undefined,   // Max
                                 s: undefined,   // Steps
-                                e:function(rv,al) {
+                                e:function(rv,al,neg) {
+                                    var po = neg!==true;
+
                                     // If no current or to reset value, then
                                     var r = this.c==undefined || rv;
 
@@ -537,7 +581,7 @@ module.exports = function(RED) {
                                     } else {
                                         this.mi = Number.parseInt(RED.util.evaluateNodeProperty(this.r.r.bMin, this.r.r.bMinType, node, this.r.msg), 10);
                                         this.ma = Number.parseInt(RED.util.evaluateNodeProperty(this.r.r.bMax, this.r.r.bMaxType, node, this.r.msg), 10);
-                                        if (this.p) {
+                                        if (this.p==po) {
                                             this.s = Number.parseInt(RED.util.evaluateNodeProperty(this.r.r.bUp, this.r.r.bUpType, node, this.r.msg), 10);
                                         } else {
                                             this.s = Number.parseInt(RED.util.evaluateNodeProperty(this.r.r.bDown, this.r.r.bDownType, node, this.r.msg), 10);
@@ -555,8 +599,8 @@ module.exports = function(RED) {
                                         if (!chkNum(this.ma, "maxVal", "Invalid max value for rule ", this.r))
                                             return;
                                         
-                                        // If negative, then convert value to negative after validation.
-                                        if (!this.p && this.s > 0)
+                                        // If positive, then convert value to negative after validation.
+                                        if (this.p!=po && this.s > 0)
                                             this.s=-this.s;
 
                                         if (al) {
@@ -569,15 +613,15 @@ module.exports = function(RED) {
 
                                             // If move to edge, then
                                             if (this.r.r.bEdge) {
-                                                if (!this.p && this.c < this.ma) {
+                                                if (this.p!=po && this.c < this.ma) {
                                                     this.c = this.ma;
-                                                } else if (this.p && this.c > this.mi) {
+                                                } else if (this.p==po && this.c > this.mi) {
                                                     this.c = this.mi;
                                                 } else {
-                                                    return this.e(false, true);
+                                                    return this.e(false, true, neg);
                                                 }
                                             } else {
-                                                return this.e(false, true);
+                                                return this.e(false, true, neg);
                                             }
                                         }
                                     }
@@ -588,13 +632,13 @@ module.exports = function(RED) {
                             break;
                         case 'fixed':
                             this.v = {
-                                r:r,            // Rule
+                                r:rule,         // Rule
                                 i:function() {  // Initial value
                                     return evalCmd(this.r, this.r.r, "init", this.r.r.fInitType, this.r.r.fInit, "fInitJS", this.r.msg, true);
                                 },
                                 c:undefined,    // Current value
-                                v:r.r.fValues,  // values array
-                                e:function(rv, al) {        // Reset value, 
+                                v:rule.r.fValues,  // values array
+                                e:function(rv, al,neg) { // Reset value, 
                                     // If no current or to reset value, then
                                     var r = this.c==undefined || rv;
                                     if (r) {
@@ -608,12 +652,29 @@ module.exports = function(RED) {
                                     }
                                     
                                     // If no reset, then iterate to next value
-                                    if (!r && al && this.c<this.v.length) {
-                                        this.c++;
+                                    if (!r && al) {
+                                        if (neg!==true) {
+                                            if (this.c<this.v.length)
+                                                this.c++;
+                                        } else {
+                                            if (this.c>=0)
+                                                this.c--;
+                                        }
                                     }
 
                                     // Validate value
-                                    if (this.c < 0) this.c = 0;
+                                    if (this.c < 0) {
+                                        // If not negative, then just set to zero
+                                        if (neg!==true) {
+                                            this.c = 0;
+                                        } else {
+                                            if (this.r.r.fCycle) {
+                                                this.c = this.v.length - 1;
+                                            } else {
+                                                return undefined;
+                                            }
+                                        }
+                                    }
                                     if (this.c>=this.v.length) {
                                         // If to cycle, then
                                         if (this.r.r.fCycle) {
@@ -629,6 +690,15 @@ module.exports = function(RED) {
                                 }
                             };
                             break;
+                        case 'linked':
+                            this.v = {
+                                r:rule,                              // Rule
+                                l:r.find(ri=>ri.r.id==rule.r.lLink), // Linked rule
+                                e:function(rv,al) {
+                                    return this.l.v.e(rv,al,this.r.r.lNeg);
+                                }
+                            };
+                            break;
                     }
                 }
             };
@@ -638,12 +708,18 @@ module.exports = function(RED) {
                 ri.msg = JSON.parse(ri.r.repMsg);
             }
 
-            ri.init();
             r.push(ri);
             
             if (!this.lastRule)
                 this.lastRule = ri;
         }
+
+        // Initiate all rules.
+        for (var i=0; i<r.length; i++) {
+            r[i].init();
+        }
+
+        this.rules = r;
         
         this.on("input", function(msg, send, done) {
             node.done = done;

@@ -15,8 +15,10 @@
         "timeOut": "Time out:",
         "value": "Value:",
         "cycle": "Cycle",
+        "neg": "Mirror effect",
         "init": "Initial value:",
         "inix": "Initial index:",
+        "lrule": "Link to rule:",
         "steps": "Steps:",
         "min": "Min:",
         "max": "Max:",
@@ -45,7 +47,8 @@
             "single": "Single value",
             "iterate": "Iterate value",
             "bounce": "Bouncing value",
-            "fixed": "Fixed values"
+            "fixed": "Fixed values",
+            "linked": "Linked rule"
         },
         "match": "Match mode:",
         "matches": {

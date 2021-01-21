@@ -136,6 +136,7 @@
         <li><code>Iterate value</code>, Loops <i>(or just raises)</i> from low to high integer values.</li>
         <li><code>Bouncing value</code>, Bouncing from low to high integer values.</li>
         <li><code>Fixed values</code>, Uses a predefined list</li>
+        <li><code>Linked rule</code>, Links to another rule's list</li>
       </ul>
     </dd>
   
@@ -234,6 +235,18 @@
       <dd>If checked, the index will move to the first record when cycled through. Otherwise it will prevent the execution.
       </dd>
     </dl>
+
+    <h4>Engine: Linked rule</h4>
+    <dl class="message-properties">
+      <dt>Link to rule<span class="property-type">rule</span></dt>
+      <dd>The rule to execute when this rule is executed.
+      </dd>
+
+      <dt>Mirror effect</dt>
+      <dd>If checked, the engine that is executed will work in reverse. <i>(This is convenient if to have two inputs that toggles raise/lower.)</i>
+        Otherwise, the rule will just be executed in normal mode.
+      </dd>
+    </dl>
   </dl>
   <h3>Details</h3>
   <p>The node will listen to an input and execute one or more of the rules depending on operation mode and if matched send out a result of the current state of the <code>output engine</code> that is used for the executed rule.
@@ -257,8 +270,17 @@
    <li><b>flow</b>: Contains the <i>get. set, keys</i> function.
    <li><b>global</b>: Contains the <i>get. set, keys</i> function.
    <li><b>env</b>: Contains the <i>get</i> function.
+   <li><b>rules</b>: Contains the <i>index(index|name), name(index|name), value(index|name), isActive(index|name), length()</i> functions.
   </ul>
-  </p>
+
+  <h4>rules object:
+  <ul>
+   <li><b>index(<i>rule.index | rule.name</i>)</b>: will get the index of the specified rule.
+   <li><b>name(<i>rule.index | rule.name</i>)</b>: will get the name of the specified rule.
+   <li><b>value(<i>rule.index | rule.name</i>)</b>: will get the latest returned value.
+   <li><b>isActive(<i>rule.index | rule.name</i>)</b>: will tell if the specified rule is currently active or not.
+   <li><b>length()</b>: Will get the number of rules that exists in this node.
+  </ul>
 
   <h3>References</h3>
   <ul>
