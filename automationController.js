@@ -86,16 +86,20 @@ module.exports = function(RED) {
                     },
                     rules: {
                         index: function(rule) {
-                            return getRule(node, rule).i;
+                            var r = getRule(node, rule); 
+                            return !!r?r.i:"Invalid rule: " + rule;
                         },
                         name: function(rule) {
-                            return getRule(node, rule).r.name;
+                            var r = getRule(node, rule); 
+                            return !!r?r.r.name:"Invalid rule: " + rule;
                         },
                         value: function(rule) {
-                            return getRule(node, rule).vLast;
+                            var r = getRule(node, rule); 
+                            return !!r?r.vLast:"Invalid rule: " + rule;
                         },
                         isActive: function(rule) {
-                            return getRule(node, rule).a;
+                            var r = getRule(node, rule); 
+                            return !!r?r.a:"Invalid rule: " + rule;
                         },
                         length: function() {
                             return node.rules.length;
@@ -124,7 +128,11 @@ module.exports = function(RED) {
             ri.script.s[fName] = createScript(node, type, s[fName]);
         }
         
+        try {
         return ri.script.run(fName, msg, inp);
+        } catch (e) {
+            console.log("Error when executing script: " + fName, e);
+        }
     }
 
     function AutomationControllerNode(config) {
@@ -695,7 +703,11 @@ module.exports = function(RED) {
                                 r:rule,                              // Rule
                                 l:r.find(ri=>ri.r.id==rule.r.lLink), // Linked rule
                                 e:function(rv,al) {
-                                    return this.l.v.e(rv,al,this.r.r.lNeg);
+                                    var r = this.l.v.e(rv,al,this.r.r.lNeg);
+                                    if (this.r.r.lUpRule) {
+                                        this.l.vLast = r;
+                                    }
+                                    return r;
                                 }
                             };
                             break;

@@ -3,6 +3,7 @@
         "name":"Automation Controller"
     },
     "label": {
+        "idx": "Index:",
         "name": "Name:",
         "input": "Input:",
         "output": "Output:",
@@ -16,6 +17,7 @@
         "value": "Value:",
         "cycle": "Cycle",
         "neg": "Mirror effect",
+        "upRule": "Update target rule's last value",
         "init": "Initial value:",
         "inix": "Initial index:",
         "lrule": "Link to rule:",

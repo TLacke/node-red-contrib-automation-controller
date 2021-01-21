@@ -35,6 +35,12 @@
     <!-- tabs -->
     <span id="rules" class="button-group"><button id="rules-create" type="button" class="red-ui-button toggle rules-group">+</button></span>
     
+    <!-- index -->
+    <div class="form-row" style="margin-top: 10px">
+        <label for="node-rule-index" data-i18n="label.idx"></label>
+        <label id="node-rule-index"></label>
+    </div>
+
     <!-- name -->
     <div class="form-row" style="margin-top: 10px">
         <label for="node-rule-name" data-i18n="rule.name"></label>
@@ -284,6 +290,14 @@
                     <span data-i18n="label.neg"></span>
                 </label>
             </div>
+            
+            <div class="form-row">
+                <label for="node-rule-lUpRule">&nbsp;</label>
+                <label style="width:70%">
+                    <input id="node-rule-lUpRule" type="checkbox" style="display:inline-block; width:15px; vertical-align:baseline;">
+                    <span data-i18n="label.upRule"></span>
+                </label>
+            </div>
         </div>
 
 <!-- delete -->
@@ -334,7 +348,8 @@
         fCycle: true,
 
         lLink: '',
-        lNeg: true
+        lNeg: true,
+        lUpRule: true
     };
     
     var selectedRule = 0;
@@ -667,6 +682,10 @@
         if (!rule)
             rule = selectedRule;
         
+        for (var i = 0; i < node.nrules.length; i++)
+            if (node.nrules[i]==rule)
+                $('#node-rule-index').text(i);
+
         $('#node-rule-name').val(rule.name);
         $('#node-rule-matchMode').val(rule.matchMode);
         $('#node-rule-mode').val(rule.mode);
@@ -710,6 +729,7 @@
         refreshRuleList(node);
         $('#node-rule-lLink').val(rule.lLink);
         read('lNeg', rule, true);
+        read('lUpRule', rule, true);
 
         $('#node-rule-fValues').empty();
         (rule.fValues || []).forEach( v => addFixedRow(node, v.v, v.t, v.js) );
@@ -775,6 +795,7 @@
 
         rule.lLink = $('#node-rule-lLink').val();
         write('lNeg', rule, true);
+        write('lUpRule', rule, true);
         
         rule.fValues = [];
         $('#node-rule-fValues').children().each((idx,e)=>{

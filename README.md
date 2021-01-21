@@ -208,6 +208,10 @@ The rule to execute instead when this rule is executed.
 If checked, the engine that is executed will work in reverse. _(This is convenient if to have two inputs that toggles raise/lower.)_
 Otherwise, the rule will just be executed in normal mode.
 
+#### Update target rule's last value
+If checked, the target _(rule linked to)_ will have it's latest value stored in it for usage with the JavaScript functions.
+Otherwise, only the current rule will have it's latest value stored.
+
 
 ### Special inputs
 The **msg.state** can be used to reset the state of the current **output engine**.
