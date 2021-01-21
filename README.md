@@ -1,7 +1,9 @@
 # node-red-contrib-automationController
-Binary motion sensor and activation state machine node for Node-red.
+The automation controller is used to help out with home automation in mind, but has other purposes as well.
+The main idea is to keep multiple inputs for the same external component to be handled within this node and output a generic result.
 
-This node is a companion for any binary sensor (physical or virtual), storing all recieved sensors and their state and merge them into a single node.
+For the easiest example: A button! Click, Double click, Hold/Release are states that the same component reports. This node enables all these states to be handled inside it and outputs a customized result.
+For more complex usage, the JavaScript field type can be used on multiple fields to enable more comprehensive tasks.
 
 ![node-appearance](assets/ac_node-appearance.png "Node appearance")  
 **Fig. 1:** Node appearance
