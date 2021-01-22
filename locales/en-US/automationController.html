@@ -279,7 +279,7 @@
    <li><b>flow</b>: Contains the <i>get. set, keys</i> function.
    <li><b>global</b>: Contains the <i>get. set, keys</i> function.
    <li><b>env</b>: Contains the <i>get</i> function.
-   <li><b>rules</b>: Contains the <i>index(index|name), name(index|name), value(index|name), isActive(index|name), length()</i> functions.
+   <li><b>rules</b>: Contains the <i>index(index|name), name(index|name), value(index|name, [newValue]), isActive(index|name), length()</i> functions.
   </ul>
 
   <h4>rules object:
@@ -287,7 +287,8 @@
    <li><b>index(<i>rule.index | rule.name</i>)</b>: will get the index of the specified rule.
    <li><b>name(<i>rule.index | rule.name</i>)</b>: will get the name of the specified rule.
    <li><b>value(<i>rule.index | rule.name</i>)</b>: will get the latest returned value.
-   <li><b>isActive(<i>rule.index | rule.name</i>)</b>: will tell if the specified rule is currently active or not.
+   <li><b>value<i>(rule.index | rule.name, newValue</i>)</b>: will set the current value <i>(it's the value before next execution)</i>
+    <li><b>isActive(<i>rule.index | rule.name</i>)</b>: will tell if the specified rule is currently active or not.
    <li><b>length()</b>: Will get the number of rules that exists in this node.
   </ul>
 

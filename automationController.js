@@ -93,9 +93,14 @@ module.exports = function(RED) {
                             var r = getRule(node, rule); 
                             return !!r?r.r.name:"Invalid rule: " + rule;
                         },
-                        value: function(rule) {
+                        value: function(rule, nv) {
                             var r = getRule(node, rule); 
-                            return !!r?r.vLast:"Invalid rule: " + rule;
+                            if (!r) return "Invalid rule";
+
+                            if (nv!==undefined)
+                                r.v.c = nv;
+                            
+                            return r.vLast;
                         },
                         isActive: function(rule) {
                             var r = getRule(node, rule); 

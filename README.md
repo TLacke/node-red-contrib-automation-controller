@@ -5,6 +5,15 @@ The main idea is to keep multiple inputs for the same external component to be h
 For the easiest example: A button! Click, Double click, Hold/Release are states that the same component reports. This node enables all these states to be handled inside it and outputs a customized result.
 For more complex usage, the JavaScript field type can be used on multiple fields to enable more comprehensive tasks.
 
+
+## Argument
+I was making a test with home automation where an IKEA 5 button implementation went crazy as shown here:
+<img src="assets/ac_example-2a.png" title="Example 2a" width="537" />
+This node is a result of this code and resulted in this:
+<img src="assets/ac_example-2b.png" title="Example 2b" width="537" />
+
+
+
 ![node-appearance](assets/ac_node-appearance.png "Node appearance")  
 **Fig. 1:** Node appearance
 
@@ -233,12 +242,13 @@ It contains the following access features:
  * **flow**: Contains the _get. set, keys_ function.
  * **global**: Contains the _get. set, keys_ function.
  * **env**: Contains the _get_ function.
- * **rules**: Contains the _index(index|name), name(index|name), value(index|name), isActive(index|name), length()_ functions.
+ * **rules**: Contains the _index(index|name), name(index|name), value(index|name,[newValue]), isActive(index|name), length()_ functions.
 
 #### rules object:
  * **index(rule.index | rule.name)**: will get the index of the specified rule.
  * **name(rule.index | rule.name)**: will get the name of the specified rule.
  * **value(rule.index | rule.name)**: will get the latest returned value.
+ * **value(rule.index | rule.name, newValue)**: will set the current value _(it's the value before next execution)_
  * **isActive(rule.index | rule.name)**: will tell if the specified rule is currently active or not.
  * **length()**: Will get the number of rules that exists in this node.
 
