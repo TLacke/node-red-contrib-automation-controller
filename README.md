@@ -12,7 +12,8 @@ I was making a test with home automation where an IKEA 5 button implementation w
 <br/>
 This node is a result of this code and resulted in this:
 <img src="assets/ac_example-2b.png" title="Example 2b" width="537" />
-
+<br/>
+<br/>
 
 
 ![node-appearance](assets/ac_node-appearance.png "Node appearance")  
