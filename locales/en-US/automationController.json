@@ -9,7 +9,7 @@
         "output": "Output:",
         "match": "When match:",
         "amatch": "Activate on:",
-        "imatch": "Deactive on:",
+        "imatch": "Deactivate on:",
         "repeat": "Repeat:",
         "cooldown": "Cooldown:",
         "resEvent": "Auto reset:",

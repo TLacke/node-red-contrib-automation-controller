@@ -33,7 +33,7 @@ The purpose of the node is to compress the complexity of the node schematics whe
 **Fig. 3:** Node appearance
 
 The node has up to 10 different rules that can be customized to fit the purpose of the specified function.
-The node has by default multiple outputs *(one for each rule, but can be reconfigured to have only a single output)*.
+The node has by default multiple outputs _(one for each rule, but can be reconfigured to have only a single output)_.
 
 <a name="node_configuration"></a>
 ### Node Configuration
@@ -43,10 +43,10 @@ The node configuration sets up how the sensor should react.
 **Fig. 4:** Node properties
 
 #### Name (optional)
-*(Optional)* The name of this node. *(Will change the content of the node to the name)*
+_(Optional)_ The name of this node. _(Will change the content of the node to the name)_
 
 #### Input
-The field to read and validate against the rule's **Match mode** *(for events)* or **Activate on** and **Deactive on** *(for states)*
+The field to read and validate against the rule's **Match mode** _(for events)_ or **Activate on** and **Deactivate on** _(for states)_
 
 #### Behavior
 Tells how the node should react when an execution occurs.
@@ -57,15 +57,15 @@ Tells how the node should react when an execution occurs.
 #### Rule tab list
 ![node-rules](assets/ac_node_rules.png "Node rule tabs")  
 Each button/tab represents a rule. By clicking on it, the rule is presented.
-To add a new rule, pres the + button *(there's a maximum of 10 rules)*.
+To add a new rule, pres the + button _(there's a maximum of 10 rules)_.
 
 #### Item name
-*(Optional)* Sets the name of the currently selected rule.
+_(Optional)_ Sets the name of the currently selected rule.
 
 #### Match mode
 Sets the mode of how this rule should function.
- * **Event**, Will execute and then go back to idle state. *(Think of it as a mouse button)*
- * **State**, Will execute and keeps active until deactivated. *(Think of it as a power button or a switch)*
+ * **Event**, Will execute and then go back to idle state. _(Think of it as a mouse button)_
+ * **State**, Will execute and keeps active until deactivated. _(Think of it as a power button or a switch)_
 
 ### Event
 
@@ -73,12 +73,12 @@ Sets the mode of how this rule should function.
 The value to match the **input** field against. When matched, this rule will be executed.
 
 #### Cooldown
-The time to wait before this action can be executed again. *(This will also prevent other rules to be executed if **behavior** is preventing multiple rules.)*
-*(Zero for disabled)*
+The time to wait before this action can be executed again. _(This will also prevent other rules to be executed if **behavior** is preventing multiple rules.)_
+_(Zero for disabled)_
 
 #### Reset event timeout
 The time to wait before the rule's current value is reset to the initial.
-*(Zero for disabled)*
+_(Zero for disabled)_
 
 
 ### State
@@ -92,8 +92,8 @@ The value to match the **input** field against to halt/stop the execution of thi
 _**JS accepted:** This field is designed to handle JavaScript (see JavaScript secion for more info). It will accept the return value to match against the input or, it can return a true/false statement to tell if matched the field._
 
 #### Time out
-The time to wait before this action can be executed again. *(This will also prevent other rules to be executed if **behavior** is preventing multiple rules.)*
-*(Zero for disabled)*
+The time to wait before this action can be executed again. _(This will also prevent other rules to be executed if **behavior** is preventing multiple rules.)_
+_(Zero for disabled)_
 
 #### Trigger action on activate...
 If **checked**, the **Activate on** match can occur while already active. Otherwise only **Deactivate on** match will be checked.
@@ -105,24 +105,26 @@ The message to use for repeat messages:
  * **Latest message**, The last message that has entered the node.
 
 #### Repeat
-The time to wait before this action can be executed again. *(This will also prevent other rules to be executed if **behavior** is preventing multiple rules.)*
-*(Zero for disabled)*
+The time to wait before this action can be executed again. _(This will also prevent other rules to be executed if **behavior** is preventing multiple rules.)_
+_(Zero for disabled)_
 
 #### Send on inactive
-The message to send when the state becomes inactive either through **Deactive on** or the **Time out**.
+The message to send when the state becomes inactive either through **Deactivate on** or the **Time out**.
 _**JS accepted:** This field is designed to handle JavaScript (see JavaScript secion for more info). It can return free of choice._
 
 #### Reset to initial value...
-If **checked**, the output mode's current value will be set to its **Initial value**. *(The result depends on the **Output mode** that is used.)*.
+If **checked**, the output mode's current value will be set to its **Initial value**. _(The result depends on the **Output mode** that is used.)_.
 
 
 #### Output
-The field to be updated with the result of the execution. *(To allow multiple rules to be executed on the same input, this field is unique per rule)*
+The field to be updated with the result of the execution. _(To allow multiple rules to be executed on the same input, this field is unique per rule)_
+_**JS accepted:** This field is designed to handle JavaScript (see JavaScript secion for more info). It can return free of choice._
+_Note: **input** value is named **output**._
 
 #### Output engine
 Tells how the output should react and work:
  * **Single value**, Sends a simple value.
- * **Iterate value**, Loops *(or just raises)* from low to high integer values.
+ * **Iterate value**, Loops _(or just raises)_ from low to high integer values.
  * **Bouncing value**, Bouncing from low to high integer values.
  * **Fixed values**, Uses a predefined list
 
@@ -135,56 +137,56 @@ _**JS accepted:** This field is designed to handle JavaScript (see JavaScript se
 
 ### Engine: Iterate value
 #### Initial value
-The initial value to use for first execution or when being reset *(either by **Reset to initial..** or by message input, **msg.state='reset'**)*.
+The initial value to use for first execution or when being reset _(either by **Reset to initial..** or by message input, **msg.state='reset'**)_.
 *This value must resolve into an integer number.*
 _**JS accepted:** This field is designed to handle JavaScript (see JavaScript secion for more info). It must return a valid integer, or 0 will be used._
 
 #### Min
-The minimum value to use when cycling through the value. *(Must resolve into an integer value less than **max** value)*
+The minimum value to use when cycling through the value. _(Must resolve into an integer value less than **max** value)_
 
 #### Max
-The maximum value to use. *(Must resolve into an integer value greater than **min** and **initial** value)*
-When this value is reached, the loop will either stop executing *(if not to **cycle**)* or move to the **min** value *(if to **cycle**)*.
+The maximum value to use. _(Must resolve into an integer value greater than **min** and **initial** value)_
+When this value is reached, the loop will either stop executing _(if not to **cycle**)_ or move to the **min** value _(if to **cycle**)_.
 
 #### Steps
-The number of jumps to add to the current value for each iteration/execution. *(Must resolve into a positive integer value)*
+The number of jumps to add to the current value for each iteration/execution. _(Must resolve into a positive integer value)_
 
 #### Cycle
 If checked, the value will cycle to min value when reached the max. Otherwise, the execution of the rule will be prevented.
 
 #### Ensure edges reached
-If checked, the value will ensure that the max value is sent if the value reached beyond the max value *(if steps is greater than 1 it might end up in max+X)*.
-And if cycle is checked, the min value will be set *(instead of "curValue - (max-min)")*.
+If checked, the value will ensure that the max value is sent if the value reached beyond the max value _(if steps is greater than 1 it might end up in max+X)_.
+And if cycle is checked, the min value will be set _(instead of "curValue - (max-min)")_.
 
 
 ### Engine: Bouncing value
 #### Initial value
-The initial value to use for first execution or when being reset *(either by **Reset to initial..** or by message input, **msg.state='reset'**)*.
+The initial value to use for first execution or when being reset _(either by **Reset to initial..** or by message input, **msg.state='reset'**)_.
 *This value must resolve into an integer number.*
 _**JS accepted:** This field is designed to handle JavaScript (see JavaScript secion for more info). It must return a valid integer, or 0 will be used._
 
 #### Min
-The minimum value to use. *(Must resolve into an integer value less than **max** value)*
+The minimum value to use. _(Must resolve into an integer value less than **max** value)_
 When this value is reached, the iteration will turn to use the **Positive steps**.
 
 #### Max
-The maximum value to use. *(Must resolve into an integer value greater than **min**)*
+The maximum value to use. _(Must resolve into an integer value greater than **min**)_
 When this value is reached, the iteration will turn to use the **Negative steps**.
 
 #### Positive steps
-The number of jumps to add to the current value for each iteration/execution while in the positive mode. *(Must resolve into a positive integer value)*
+The number of jumps to add to the current value for each iteration/execution while in the positive mode. _(Must resolve into a positive integer value)_
 
 #### Negative steps
-The number of jumps to subtract from the current value for each iteration/execution while in the negative mode. *(Must resolve into a positive integer value and will automatically be converted to a negative value)*
+The number of jumps to subtract from the current value for each iteration/execution while in the negative mode. _(Must resolve into a positive integer value and will automatically be converted to a negative value)_
 
 #### Ensure edges reached
-If checked, the value will ensure that the max value is sent if the value reached beyond the max value *(if steps is greater than 1 it might end up in **max**+(X-1) or **min**-(X-1) and will be converted to just **min**/**max**.)*.
+If checked, the value will ensure that the max value is sent if the value reached beyond the max value _(if steps is greater than 1 it might end up in **max**+(X-1) or **min**-(X-1) and will be converted to just **min**/**max**.)_.
 
 
 ### Engine: Fixed values
 #### Initial index
-The initial index to use for first execution or when being reset *(either by **Reset to initial..** or by message input, **msg.state='reset'**)*.
-This value must resolve into a positive integer number matching one of the items *(First record starts on zero)*
+The initial index to use for first execution or when being reset _(either by **Reset to initial..** or by message input, **msg.state='reset'**)_.
+This value must resolve into a positive integer number matching one of the items _(First record starts on zero)_
 _**JS accepted:** This field is designed to handle JavaScript (see JavaScript secion for more info). It must return a valid integer, or 0 will be used._
 
 #### Index #
@@ -215,11 +217,13 @@ Otherwise, only the current rule will have it's latest value stored.
 
 ### Special inputs
 The **msg.state** can be used to reset the state of the current **output engine**.
-The **msg.engineValue** can be used to override the current value *(before execution, this means that the value will be altered)*.
+The **msg.engineValue** can be used to override the current value _(before execution, this means that the value will be altered)_.
 
 ### JavaScript
 Some fields has been JavaScript enabled. The engine works the same way in all different functions.
 It contains the following access features:
+ * **input**: Is available for the **When match**, **activate on** and **Deactivate on** fields and contains the input value.
+ * **output**: Is available for the **output** field and contains the output data of the rule.
  * **lastValue**: Contains the latest executed value from all the rules.
  * **lastRuleValue**: Contains the latest executed value from the current rule.
  * **lastRuleName**: Contains the name of the latest executed rule.

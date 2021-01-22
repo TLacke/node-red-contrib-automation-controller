@@ -118,7 +118,12 @@ module.exports = function(RED) {
                     this.ctx.lastValue = node.lastRule.vLast;
                     this.ctx.lastRuleValue = ri.vLast;
                     this.ctx.lastRuleName = node.lastRule.r.name;
-                    if (inp !== undefined) this.ctx.input = inp;
+                    if (inp !== undefined) {
+                        if (name!='outputJS')
+                            this.ctx.input = inp;
+                        else
+                            this.ctx.output = inp;
+                    }
                     return this.s[name].runInContext(this.ctx);
                 }
             };
@@ -146,30 +151,44 @@ module.exports = function(RED) {
 
         var so = config.seperated;  // Seperated outputs
         var lm;                     // Latest message
-        var act = [];
+        var act = [];               // Active nodes
+        
+        var lazy = false;           // Lazy saving
+        var sav = [];               // Active savings
+
         var r = [];     // Rules
         var ri;         // Rule item
         var ru;         // Rule config
         
         this.lastRule = undefined;
         
-        function flagActive(r) {
-            if (r.a) {
-                if (act.indexOf(r)==-1)
-                    act.push(r);
+        function flagArr(ar,r,a) {
+            if (a) {
+                if (ar.indexOf(r)==-1)
+                    ar.push(r);
+                    return true;
                 
             } else {
-                for (var i=act.length-1;i>=0;i--) {
-                    if (act[i]==r) {
-                        act.splice(i,1);
-                        break;
+                for (var i=ar.length-1;i>=0;i--) {
+                    if (ar[i]==r) {
+                        ar.splice(i,1);
+                        return true;
                     }
                 }
             }
+            return false;
         }
 
+        function flagActive(r) {
+            return flagArr(act, r, r.a);
+        }
+        
+        function flagSave(r,s) {
+            return flagArr(sav, r, s);
+        }
+        
         function checkDone() {
-            if (act.length==0) {
+            if (act.length==0 && sav.length==0) {
                 node.done();
             }
         }
@@ -416,8 +435,44 @@ module.exports = function(RED) {
                     }
                     
                     if (msg !== undefined && v !== undefined) {
-                        var m = Object.assign({},msg);
-                        m[this.r.output] = v;
+                        var m;
+                        switch (this.r.outputType) {
+                            case 'msg':
+                                m = Object.assign({},msg);
+                                m[this.r.output] = v;
+                                break;
+
+                            case 'flow':
+                            case 'global':
+                                m = msg;
+                                var ctx = RED.util.parseContextStore(this.r.output);
+                                
+                                // Use lacy flag to check context callback directly returned.
+                                lazy=true;
+                                node.context()[this.r.outputType].set(ctx.key, v, ctx.store, (err,cur)=>{
+                                    lazy = false;
+                                    var fnd = flagSave(this, false);
+
+                                    if (err)
+                                        node.error(undefined,null);
+
+                                    // Only done if removed.
+                                    if (fnd)
+                                        checkDone();
+                                });
+                                
+                                // If context not yet stored, then add to lazy saving.
+                                if (lazy) flagSave(this, true);
+                                lazy=false;
+
+                                break;
+
+                            case 'js':
+                                m = Object.assign({},msg);
+                                runScript(node, this.r, this.r, "output", "outputJS", m, v);
+                                break;
+
+                        }
                         
                         if (so) {
                             // If no result object, then create one and send, otherwise add to it

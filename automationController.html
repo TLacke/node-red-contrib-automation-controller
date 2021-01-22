@@ -157,6 +157,7 @@
     <div class="form-row">
         <label for="node-rule-output" data-i18n="label.output"></label>
         <input type="text" id="node-rule-output" style="width:70%">
+        <input type="hidden" id="node-rule-outputJS">
     </div>
 
     <!-- mode -->
@@ -692,6 +693,7 @@
         updateMode(rule.mode);
         
         read('output', rule);
+        $('#node-rule-outputJS').val(rule.outputJS);
         read('active', rule);
         $('#node-rule-activeJS').val(rule.activeJS);
         read('inactive', rule);
@@ -759,6 +761,7 @@
         rule.mode = $('#node-rule-mode').val();
 
         write('output', rule);
+        rule.outputJS = rule.outputType=='js' ? $('#node-rule-outputJS').val() : '';
         write('active', rule);
         rule.activeJS = rule.activeType=='js' ? $('#node-rule-activeJS').val() : '';
         write('inactive', rule);
@@ -910,7 +913,7 @@
             }};
             
             // Setup fields
-            $("#node-rule-output").typedInput(    { default:"msg", types:['msg'] });
+            $("#node-rule-output").typedInput(    { default:"msg", types:['msg','flow','global',opt.js] });
 
             $("#node-rule-active").typedInput(    { default:"str", types:['msg','flow','global','str','num','bool','json','bin','date','jsonata','env',opt.js] });
             $("#node-rule-inactive").typedInput(  { default:"str", types:['msg','flow','global','str','num','bool','json','bin','date','jsonata','env',opt.js] });

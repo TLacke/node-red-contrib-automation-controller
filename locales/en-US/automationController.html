@@ -36,7 +36,7 @@
     </dd>
   
     <dt>Input<span class="property-type">msg.[] | flow.[] | global.[] | env. variable</span></dt>
-    <dd>The field to read and validate against the rule's <code>Match mode</code> <i>(for events)</i> or <code>Activate on</code> and <code>Deactive on</code> <i>(for states)</i></dd>
+    <dd>The field to read and validate against the rule's <code>Match mode</code> <i>(for events)</i> or <code>Activate on</code> and <code>Deactivate on</code> <i>(for states)</i></dd>
     </dd>
   
     <dt>Behavior</dt>
@@ -116,7 +116,7 @@
       </dd>
     
       <dt>Send on inactive<span class="property-type">*</span></dt>
-      <dd>The message to send when the state becomes inactive either through <code>Deactive on</code> or the <code>Time out</code>.
+      <dd>The message to send when the state becomes inactive either through <code>Deactivate on</code> or the <code>Time out</code>.
         <br><i><b>JS accepted:</b> This field is designed to handle JavaScript (see JavaScript secion for more info). It can return free of choice.</i>
       </dd>
       
@@ -125,8 +125,10 @@
       </dd>
     </dl>
     
-    <dt>Output<span class="property-type">msg.[]</span></dt>
+    <dt>Output<span class="property-type">msg.[] | flow.[] | global.[] | JavaScript</span></dt>
     <dd>The field to be updated with the result of the execution. <i>(To allow multiple rules to be executed on the same input, this field is unique per rule)</i>
+      <br><i><b>JS accepted:</b> This field is designed to handle JavaScript (see JavaScript secion for more info).<br>
+      Note: <b>input</b> value is named <b>output</b>.</i>
     </dd>
 
     <dt>Output engine</dt>
@@ -150,7 +152,7 @@
     
     <h4>Engine: Iterate value</h4>
     <dl class="message-properties">
-      <dt>Initial value<span class="property-type">number | msg.[] | flow.[] | global.[] | env. var</span></dt>
+      <dt>Initial value<span class="property-type">number | msg.[] | flow.[] | global.[] | env. var | JavaScript</span></dt>
       <dd>The initial value to use for first execution or when being reset <i>(either by <code>Reset to initial..</code> or by message input, <code>msg.state='reset'</code>)</i>.
         <br><i>This value must resolve into an integer number.</i>
         <br><i><b>JS accepted:</b> This field is designed to handle JavaScript (see JavaScript secion for more info). It must return a valid integer, or 0 will be used.</i>
@@ -181,7 +183,7 @@
     
     <h4>Engine: Bouncing value</h4>
     <dl class="message-properties">
-      <dt>Initial value<span class="property-type">number | msg.[] | flow.[] | global.[] | env. var</span></dt>
+      <dt>Initial value<span class="property-type">number | msg.[] | flow.[] | global.[] | env. var | JavaScript</span></dt>
       <dd>The initial value to use for first execution or when being reset <i>(either by <code>Reset to initial..</code> or by message input, <code>msg.state='reset'</code>)</i>.
         <br><i>This value must resolve into an integer number.</i>
         <br><i><b>JS accepted:</b> This field is designed to handle JavaScript (see JavaScript secion for more info). It must return a valid integer, or 0 will be used.</i>
@@ -212,7 +214,7 @@
     
     <h4>Engine: Fixed values</h4>
     <dl class="message-properties">
-      <dt>Initial index<span class="property-type">number | msg.[] | flow.[] | global.[] | env. var</span></dt>
+      <dt>Initial index<span class="property-type">number | msg.[] | flow.[] | global.[] | env. var | JavaScript</span></dt>
       <dd>The initial index to use for first execution or when being reset <i>(either by <code>Reset to initial..</code> or by message input, <code>msg.state='reset'</code>)</i>.
         <br>This value must resolve into a positive integer number matching one of the items <i>(First record starts on zero)</i>
         <br><i><b>JS accepted:</b> This field is designed to handle JavaScript (see JavaScript secion for more info). It must return a valid integer, or 0 will be used.</i>
@@ -266,6 +268,8 @@
   <p>Some fields has been JavaScript enabled. The engine works the same way in all different functions.
   It contains the following access features:
   <ul>
+   <li><b>input</b>: Is available for the <b>When match</b>, <b>activate on</b> and <b>Deactivate on</b> fields and contains the input value.
+   <li><b>output</b>: Is available for the <b>output</b> field and contains the output data of the rule.
    <li><b>lastValue</b>: Contains the latest executed value from all the rules.
    <li><b>lastRuleValue</b>: Contains the latest executed value from the current rule.
    <li><b>lastRuleName</b>: Contains the name of the latest executed rule.
