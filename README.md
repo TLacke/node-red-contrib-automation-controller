@@ -9,6 +9,7 @@ For more complex usage, the JavaScript field type can be used on multiple fields
 ## Argument
 I was making a test with home automation where an IKEA 5 button implementation went crazy as shown here:
 <img src="assets/ac_example-2a.png" title="Example 2a" width="537" />
+<br/>
 This node is a result of this code and resulted in this:
 <img src="assets/ac_example-2b.png" title="Example 2b" width="537" />
 
